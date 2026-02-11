@@ -1,0 +1,29 @@
+{
+  "name": "openclaw-r2-status-hook",
+  "version": "1.0.0",
+  "description": "OpenClaw hook for pushing agent status to Cloudflare R2",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "keywords": [
+    "openclaw",
+    "hook",
+    "r2",
+    "status"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.4",
+    "fast-check": "^3.15.0",
+    "@types/node": "^20.10.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.450.0"
+  }
+}

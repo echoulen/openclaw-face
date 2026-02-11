@@ -6,7 +6,7 @@
 
 ## Tasks
 
-- [ ] 1. 設定專案結構和核心型別定義
+- [x] 1. 設定專案結構和核心型別定義
   - 建立 `hooks/r2-status/` 目錄結構
   - 建立 `face/` 目錄結構
   - 定義共用的 TypeScript 型別（StatusPayload, ConnectionState）
@@ -14,32 +14,32 @@
   - 安裝必要的依賴套件（@aws-sdk/client-s3, fast-check, vitest）
   - _Requirements: 10.1, 10.2, 10.3, 10.6_
 
-- [ ] 2. 實作 R2 Status Hook 核心功能
-  - [ ] 2.1 實作配置管理模組（config.ts）
+- [x] 2. 實作 R2 Status Hook 核心功能
+  - [x] 2.1 實作配置管理模組（config.ts）
     - 從環境變數讀取 R2 配置
     - 驗證必要的環境變數存在
     - 匯出型別安全的配置物件
     - _Requirements: 2.4, 6.2_
   
-  - [ ] 2.2 實作 R2 上傳器（uploader.ts）
+  - [x] 2.2 實作 R2 上傳器（uploader.ts）
     - 建立 S3Client 實例（連接 R2 endpoint）
     - 實作 uploadStatus 函式（PutObject 到 status.json）
     - 實作錯誤處理和日誌記錄
     - 設定 5 秒上傳超時
     - _Requirements: 1.6, 7.1, 7.2_
   
-  - [ ] 2.3 實作 Hook 主邏輯（index.ts）
+  - [x] 2.3 實作 Hook 主邏輯（index.ts）
     - 實作 onModelCall 事件處理器（設定 busy: true）
     - 實作 onComplete 事件處理器（設定 busy: false）
     - 建立 StatusPayload 物件（包含 busy, model, ts, taskId）
     - 整合上傳器進行狀態推送
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-- [ ] 3. Checkpoint - 確保 Hook 測試通過
+- [x] 3. Checkpoint - 確保 Hook 測試通過
   - 執行所有 Hook 測試，確保通過
   - 如有問題請詢問使用者
 
-- [ ] 4. 設定 Face 專案基礎
+- [-] 4. 設定 Face 專案基礎
   - [ ] 4.1 初始化 Vite + React + TypeScript 專案
     - 使用 `pnpm create vite` 建立專案
     - 配置 TypeScript 嚴格模式
