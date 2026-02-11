@@ -1,14 +1,14 @@
-# Implementation Plan: OpenClaw Status Dashboard
+# Implementation Plan: OpenClaw Face
 
 ## Overview
 
-本實作計畫將 OpenClaw Status Dashboard 分為三個主要階段：Hook 開發、Dashboard 前端開發、以及整合測試。每個階段都包含核心實作和對應的測試任務，確保增量驗證功能正確性。
+本實作計畫將 OpenClaw Face 分為三個主要階段：Hook 開發、Face 前端開發、以及整合測試。每個階段都包含核心實作和對應的測試任務，確保增量驗證功能正確性。
 
 ## Tasks
 
 - [ ] 1. 設定專案結構和核心型別定義
   - 建立 `hooks/r2-status/` 目錄結構
-  - 建立 `dashboard/` 目錄結構
+  - 建立 `face/` 目錄結構
   - 定義共用的 TypeScript 型別（StatusPayload, ConnectionState）
   - 設定 TypeScript 編譯配置
   - 安裝必要的依賴套件（@aws-sdk/client-s3, fast-check, vitest）
@@ -39,7 +39,7 @@
   - 執行所有 Hook 測試，確保通過
   - 如有問題請詢問使用者
 
-- [ ] 4. 設定 Dashboard 專案基礎
+- [ ] 4. 設定 Face 專案基礎
   - [ ] 4.1 初始化 Vite + React + TypeScript 專案
     - 使用 `pnpm create vite` 建立專案
     - 配置 TypeScript 嚴格模式
@@ -59,7 +59,7 @@
     - 建立 config.ts（R2 public URL）
     - _Requirements: 1.3, 1.4, 1.5_
 
-- [ ] 5. 實作 Dashboard 狀態輪詢邏輯
+- [ ] 5. 實作 Face 狀態輪詢邏輯
   - [ ] 5.1 實作 useStatusPolling 自訂 Hook
     - 實作每 5 秒的輪詢邏輯
     - 實作 fetch 請求和 JSON 解析
@@ -83,7 +83,7 @@
     - 更新 sketch 狀態當 props 改變
     - _Requirements: 4.1, 4.2, 4.7_
 
-- [ ] 7. 實作 Dashboard UI 元件
+- [ ] 7. 實作 Face UI 元件
   - [ ] 7.1 建立 StatusDisplay 元件
     - 顯示當前模型名稱
     - 顯示最新更新時間（格式化）
@@ -98,7 +98,7 @@
     - 使用 MUI Alert 元件
     - _Requirements: 3.4, 7.4_
 
-- [ ] 8. 整合 Dashboard 主應用程式
+- [ ] 8. 整合 Face 主應用程式
   - [ ] 8.1 建立 App.tsx 主元件
     - 整合 useStatusPolling hook
     - 整合 HeartbeatCanvas 元件
@@ -107,7 +107,7 @@
     - 使用 MUI ThemeProvider 設定主題
     - _Requirements: 3.1, 4.1, 4.5, 4.6_
 
-- [ ] 9. Checkpoint - 確保 Dashboard 功能正常
+- [ ] 9. Checkpoint - 確保 Face 功能正常
   - 手動測試 Dashboard 基本功能
   - 如有問題請詢問使用者
 
@@ -118,8 +118,8 @@
     - 複製到 OpenClaw hooks 目錄
     - _Requirements: 6.1_
   
-  - [ ] 10.2 建立 Dashboard 部署腳本
-    - 建立 `dashboard/deploy.sh`
+  - [ ] 10.2 建立 Face 部署腳本
+    - 建立 `face/deploy.sh`
     - 執行 `pnpm build`
     - 推送 dist/ 到 gh-pages 分支
     - _Requirements: 6.3, 6.5_

@@ -2,7 +2,7 @@
 
 ## Introduction
 
-OpenClaw Status Dashboard 是一個安全的代理狀態視覺化系統，使用 p5.js 心率動畫顯示 OpenClaw 代理的忙碌狀態。系統採用零 port 暴露架構，OpenClaw 透過 hook 主動推送狀態至 Cloudflare R2，外部 GitHub Pages 透過 polling 讀取並視覺化呈現。
+OpenClaw Face 是一個安全的代理狀態視覺化系統，使用 p5.js 心率動畫顯示 OpenClaw 代理的忙碌狀態。系統採用零 port 暴露架構，OpenClaw 透過 hook 主動推送狀態至 Cloudflare R2，外部 GitHub Pages 透過 polling 讀取並視覺化呈現。
 
 ## Glossary
 

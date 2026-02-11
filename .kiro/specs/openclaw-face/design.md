@@ -2,11 +2,11 @@
 
 ## Overview
 
-OpenClaw Status Dashboard 採用推送-輪詢架構，實現零 port 暴露的安全狀態監控系統。系統由三個主要元件組成：
+OpenClaw Face 採用推送-輪詢架構，實現零 port 暴露的安全狀態監控系統。系統由三個主要元件組成：
 
 1. **OpenClaw Hook (r2-status)**: 監聽代理事件並推送狀態至 R2
 2. **Cloudflare R2**: 作為狀態資料的中間儲存層
-3. **GitHub Pages Dashboard**: 輪詢 R2 並使用 p5.js 視覺化呈現
+3. **GitHub Pages Face**: 輪詢 R2 並使用 p5.js 視覺化呈現
 
 此設計確保 OpenClaw 不需要開放任何對外端口，所有通訊都是單向推送或公開讀取。
 
@@ -39,7 +39,7 @@ OpenClaw Status Dashboard 採用推送-輪詢架構，實現零 port 暴露的�
          ▼
 ┌─────────────────┐
 │ GitHub Pages    │
-│  Dashboard      │
+│  Face           │
 │  (React+p5.js)  │
 └─────────────────┘
 ```
@@ -49,15 +49,15 @@ OpenClaw Status Dashboard 採用推送-輪詢架構，實現零 port 暴露的�
 1. **Event Trigger**: OpenClaw 觸發 `agent:model_call` 或 `agent:complete` 事件
 2. **Hook Processing**: r2-status hook 接收事件，建立 Status_JSON
 3. **R2 Upload**: Hook 使用 S3 SDK 上傳 JSON 至 R2
-4. **Polling**: Dashboard 每 5 秒發送 GET 請求至 R2 public URL
-5. **Visualization**: Dashboard 解析 JSON 並更新 p5.js 動畫
+4. **Polling**: Face 每 5 秒發送 GET 請求至 R2 public URL
+5. **Visualization**: Face 解析 JSON 並更新 p5.js 動畫
 
 ### Security Model
 
 - **Zero Port Exposure**: OpenClaw 不開放任何監聽端口
 - **One-way Push**: Hook 僅推送，不接收外部請求
 - **Public Read Only**: R2 bucket 僅允許 GET 操作
-- **No Credentials in Frontend**: Dashboard 不包含任何 API key
+- **No Credentials in Frontend**: Face 不包含任何 API key
 
 ## Components and Interfaces
 
@@ -142,9 +142,9 @@ export interface R2Config {
 - Content-Type: `application/json`
 - Size: < 1KB
 
-### 3. Dashboard Frontend
+### 3. Face Frontend
 
-**Location**: `dashboard/`
+**Location**: `face/`
 
 **Tech Stack**:
 - React 18
@@ -156,7 +156,7 @@ export interface R2Config {
 **Components**:
 
 ```typescript
-// dashboard/src/types.ts
+// face/src/types.ts
 export interface AgentStatus {
   busy: boolean;
   model: string;
@@ -170,7 +170,7 @@ export interface ConnectionState {
   failureCount: number;
 }
 
-// dashboard/src/components/StatusFetcher.tsx
+// face/src/components/StatusFetcher.tsx
 export class StatusFetcher {
   private r2Url: string;
   private pollInterval: number = 5000;
@@ -187,7 +187,7 @@ export class StatusFetcher {
   fetchStatus(): Promise<AgentStatus>;
 }
 
-// dashboard/src/components/HeartbeatCanvas.tsx
+// face/src/components/HeartbeatCanvas.tsx
 export interface HeartbeatCanvasProps {
   status: AgentStatus | null;
   connectionState: ConnectionState;
@@ -199,7 +199,7 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps>;
 **p5.js Sketch**:
 
 ```typescript
-// dashboard/src/sketches/heartbeat.ts
+// face/src/sketches/heartbeat.ts
 export interface HeartbeatSketch {
   // p5.js setup
   setup(p5: P5, canvasParentRef: Element): void;
@@ -333,13 +333,13 @@ interface ConnectionState {
 
 ### Property 6: 輪詢失敗後自動恢復
 
-*對於任何* 輪詢失敗序列，當後續請求成功時，Dashboard 應重置失敗計數為 0 並繼續正常輪詢
+*對於任何* 輪詢失敗序列，當後續請求成功時，Face 應重置失敗計數為 0 並繼續正常輪詢
 
 **Validates: Requirements 3.5, 7.5**
 
 ### Property 7: UI 顯示狀態資訊完整性
 
-*對於任何* 有效的 AgentStatus，Dashboard 的 DOM 應包含 model 名稱和格式化的時間戳文字
+*對於任何* 有效的 AgentStatus，Face 的 DOM 應包含 model 名稱和格式化的時間戳文字
 
 **Validates: Requirements 4.5, 4.6**
 
@@ -441,7 +441,7 @@ interface ErrorRecovery {
 - 關鍵屬性（如序列化、狀態轉換）使用 50 次
 - 簡單屬性（如欄位驗證）使用 20 次
 - 每個測試必須標註對應的設計文件屬性
-- 標籤格式: `Feature: openclaw-status-dashboard, Property {number}: {property_text}`
+- 標籤格式: `Feature: openclaw-face, Property {number}: {property_text}`
 
 **屬性測試實作**:
 - 每個正確性屬性必須由單一屬性測試實作
@@ -456,7 +456,7 @@ interface ErrorRecovery {
 - 測試錯誤處理（上傳失敗情境）
 - 測試配置驗證
 
-**Dashboard 單元測試**:
+**Face 單元測試**:
 - Mock fetch API 測試輪詢邏輯
 - 測試連線狀態轉換
 - 測試 UI 元件渲染（使用 React Testing Library）
@@ -464,14 +464,14 @@ interface ErrorRecovery {
 - 測試錯誤恢復流程
 
 **Integration Tests**:
-- 端到端測試：Mock R2 → Hook 推送 → Dashboard 輪詢
+- 端到端測試：Mock R2 → Hook 推送 → Face 輪詢
 - 測試完整的狀態更新流程
 - 測試錯誤情境下的系統行為
 
 ### Test Coverage Goals
 
 - Hook: 90%+ 程式碼覆蓋率
-- Dashboard: 85%+ 程式碼覆蓋率（排除 p5.js 視覺化程式碼）
+- Face: 85%+ 程式碼覆蓋率（排除 p5.js 視覺化程式碼）
 - 所有 10 個屬性都有對應的屬性測試
 - 關鍵錯誤路徑都有單元測試覆蓋
 
@@ -515,7 +515,7 @@ hooks/r2-status/
 
 **File Structure**:
 ```
-dashboard/
+face/
 ├── src/
 │   ├── App.tsx                    # 主應用程式
 │   ├── components/
@@ -550,7 +550,7 @@ dashboard/
 3. 設定環境變數
 4. 啟用: `openclaw hooks enable r2-status`
 
-**Dashboard Deployment**:
+**Face Deployment**:
 1. 建置: `pnpm build`
 2. 輸出到 `dist/`
 3. 推送到 `gh-pages` 分支
@@ -572,7 +572,7 @@ R2_BUCKET=openclaw-status-[user]
 - 失敗不影響 OpenClaw 效能
 - JSON 序列化開銷極小（< 1ms）
 
-**Dashboard Performance**:
+**Face Performance**:
 - 輪詢間隔 5 秒，避免過度請求
 - p5.js 動畫使用 requestAnimationFrame
 - React 元件使用 memo 避免不必要的重渲染
@@ -606,7 +606,7 @@ R2_BUCKET=openclaw-status-[user]
 - 記錄上傳延遲
 - 記錄錯誤堆疊
 
-**Dashboard Monitoring**:
+**Face Monitoring**:
 - 顯示連線狀態
 - 顯示最後更新時間
 - 顯示失敗計數（開發模式）
