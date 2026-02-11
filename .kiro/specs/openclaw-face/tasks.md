@@ -39,27 +39,27 @@
   - 執行所有 Hook 測試，確保通過
   - 如有問題請詢問使用者
 
-- [-] 4. 設定 Face 專案基礎
-  - [ ] 4.1 初始化 Vite + React + TypeScript 專案
+- [x] 4. 設定 Face 專案基礎
+  - [x] 4.1 初始化 Vite + React + TypeScript 專案
     - 使用 `pnpm create vite` 建立專案
     - 配置 TypeScript 嚴格模式
     - 安裝 React 18 和相關型別定義
     - _Requirements: 10.1, 10.2, 10.4_
   
-  - [ ] 4.2 安裝和配置 UI 依賴
+  - [x] 4.2 安裝和配置 UI 依賴
     - 安裝 Material-UI (MUI)
     - 安裝 p5.js 和 react-p5
     - 安裝測試工具（vitest, @testing-library/react, fast-check）
     - 配置 Vite 測試環境
     - _Requirements: 10.5, 10.3_
   
-  - [ ] 4.3 建立型別定義和配置
+  - [x] 4.3 建立型別定義和配置
     - 定義 AgentStatus 介面
     - 定義 ConnectionState 介面
     - 建立 config.ts（R2 public URL）
     - _Requirements: 1.3, 1.4, 1.5_
 
-- [ ] 5. 實作 Face 狀態輪詢邏輯
+- [-] 5. 實作 Face 狀態輪詢邏輯
   - [ ] 5.1 實作 useStatusPolling 自訂 Hook
     - 實作每 5 秒的輪詢邏輯
     - 實作 fetch 請求和 JSON 解析
