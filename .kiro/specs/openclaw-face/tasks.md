@@ -98,8 +98,8 @@
     - 使用 MUI Alert 元件
     - _Requirements: 3.4, 7.4_
 
-- [-] 8. 整合 Face 主應用程式
-  - [ ] 8.1 建立 App.tsx 主元件
+- [x] 8. 整合 Face 主應用程式
+  - [x] 8.1 建立 App.tsx 主元件
     - 整合 useStatusPolling hook
     - 整合 HeartbeatCanvas 元件
     - 整合 StatusDisplay 元件
@@ -107,11 +107,11 @@
     - 使用 MUI ThemeProvider 設定主題
     - _Requirements: 3.1, 4.1, 4.5, 4.6_
 
-- [ ] 9. Checkpoint - 確保 Face 功能正常
+- [x] 9. Checkpoint - 確保 Face 功能正常
   - 手動測試 Dashboard 基本功能
   - 如有問題請詢問使用者
 
-- [ ] 10. 建立部署腳本和文件
+- [-] 10. 建立部署腳本和文件
   - [ ] 10.1 建立 Hook 部署腳本
     - 建立 `hooks/r2-status/deploy.sh`
     - 編譯 TypeScript
