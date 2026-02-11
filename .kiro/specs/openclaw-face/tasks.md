@@ -59,16 +59,16 @@
     - 建立 config.ts（R2 public URL）
     - _Requirements: 1.3, 1.4, 1.5_
 
-- [-] 5. 實作 Face 狀態輪詢邏輯
-  - [ ] 5.1 實作 useStatusPolling 自訂 Hook
+- [x] 5. 實作 Face 狀態輪詢邏輯
+  - [x] 5.1 實作 useStatusPolling 自訂 Hook
     - 實作每 5 秒的輪詢邏輯
     - 實作 fetch 請求和 JSON 解析
     - 實作錯誤處理和重試邏輯
     - 實作 ConnectionState 管理（失敗計數、連線狀態）
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-- [ ] 6. 實作 p5.js 心率動畫
-  - [ ] 6.1 建立 Heartbeat Sketch（heartbeat.ts）
+- [x] 6. 實作 p5.js 心率動畫
+  - [x] 6.1 建立 Heartbeat Sketch（heartbeat.ts）
     - 實作 setup 函式（建立 400x200 canvas）
     - 實作 draw 函式（繪製動畫迴圈）
     - 實作閒置狀態：綠色 sin 波動畫
@@ -77,28 +77,28 @@
     - 實作狀態轉換動畫（1 秒平滑過渡）
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.7_
   
-  - [ ] 6.2 建立 HeartbeatCanvas React 元件
+  - [x] 6.2 建立 HeartbeatCanvas React 元件
     - 使用 react-p5 包裝 p5.js sketch
     - 接收 status 和 connectionState props
     - 更新 sketch 狀態當 props 改變
     - _Requirements: 4.1, 4.2, 4.7_
 
-- [ ] 7. 實作 Face UI 元件
-  - [ ] 7.1 建立 StatusDisplay 元件
+- [x] 7. 實作 Face UI 元件
+  - [x] 7.1 建立 StatusDisplay 元件
     - 顯示當前模型名稱
     - 顯示最新更新時間（格式化）
     - 顯示 taskId（若存在）
     - 使用 MUI Typography 元件
     - _Requirements: 4.5, 4.6_
   
-  - [ ] 7.2 建立 ConnectionIndicator 元件
+  - [x] 7.2 建立 ConnectionIndicator 元件
     - 顯示連線狀態指示器
     - 顯示失敗計數（開發模式）
     - 顯示連線錯誤訊息（失敗 >= 3 次）
     - 使用 MUI Alert 元件
     - _Requirements: 3.4, 7.4_
 
-- [ ] 8. 整合 Face 主應用程式
+- [-] 8. 整合 Face 主應用程式
   - [ ] 8.1 建立 App.tsx 主元件
     - 整合 useStatusPolling hook
     - 整合 HeartbeatCanvas 元件
