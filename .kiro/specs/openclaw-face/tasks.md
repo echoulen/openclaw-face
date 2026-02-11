@@ -111,44 +111,44 @@
   - 手動測試 Dashboard 基本功能
   - 如有問題請詢問使用者
 
-- [-] 10. 建立部署腳本和文件
-  - [ ] 10.1 建立 Hook 部署腳本
+- [x] 10. 建立部署腳本和文件
+  - [x] 10.1 建立 Hook 部署腳本
     - 建立 `hooks/r2-status/deploy.sh`
     - 編譯 TypeScript
     - 複製到 OpenClaw hooks 目錄
     - _Requirements: 6.1_
   
-  - [ ] 10.2 建立 Face 部署腳本
+  - [x] 10.2 建立 Face 部署腳本
     - 建立 `face/deploy.sh`
     - 執行 `pnpm build`
     - 推送 dist/ 到 gh-pages 分支
     - _Requirements: 6.3, 6.5_
   
-  - [ ] 10.3 建立測試腳本
+  - [x] 10.3 建立測試腳本
     - 建立 `hooks/r2-status/test-push.sh`
     - 模擬事件觸發測試 Hook 推送
     - _Requirements: 6.4_
   
-  - [ ] 10.4 建立環境變數範例檔案
+  - [x] 10.4 建立環境變數範例檔案
     - 建立 `.env.example`
     - 記錄所有必要的環境變數
     - _Requirements: 2.4, 6.2_
   
-  - [ ] 10.5 建立 README 文件
+  - [x] 10.5 建立 README 文件
     - 撰寫安裝指南
     - 撰寫配置指南（R2 bucket 設定、CORS）
     - 撰寫部署指南
     - 撰寫測試指南
     - _Requirements: 2.1, 2.2, 2.3, 6.1, 6.3_
 
-- [ ] 11. R2 Bucket 配置文件
-  - [ ] 11.1 建立 R2 配置文件
+- [x] 11. R2 Bucket 配置文件
+  - [x] 11.1 建立 R2 配置文件
     - 建立 `r2-config.json`（CORS 規則範例）
     - 記錄 bucket 命名規範
     - 記錄 IAM 權限設定
     - _Requirements: 2.1, 2.2, 2.3, 2.5_
 
-- [ ] 12. Final Checkpoint - 完整系統驗證
+- [x] 12. Final Checkpoint - 完整系統驗證
   - 手動測試完整流程（Hook → R2 → Dashboard）
   - 驗證部署腳本可執行
   - 確認文件完整性
