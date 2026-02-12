@@ -70,27 +70,96 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
         }
 
         p.background(30, 30, 30);
-        p.stroke(st.currentColor);
 
+        const centerX = st.width / 2;
+        const centerY = st.height / 2;
+        const baseRadius = 50;
+
+        // Draw circular heartbeat visualization
         if (st.currentState === 'busy') {
-          (p.drawingContext as CanvasRenderingContext2D).shadowBlur = 20;
+          // Busy state: pulsing circles with glow
+          (p.drawingContext as CanvasRenderingContext2D).shadowBlur = 30;
           (p.drawingContext as CanvasRenderingContext2D).shadowColor = st.currentColor.toString();
-        } else {
-          (p.drawingContext as CanvasRenderingContext2D).shadowBlur = 0;
-        }
-
-        p.beginShape();
-        for (let x = 0; x <= st.width; x += 2) {
-          let y = st.height / 2;
-          if (st.currentState === 'busy') {
-            const pulseScale = 1.0 + 0.3 * Math.sin(st.time * 3);
-            y = st.height / 2 + Math.sin(x * 0.02 + st.phase) * st.currentAmplitude * pulseScale;
-          } else {
-            y = st.height / 2 + Math.sin(x * 0.02 + st.phase) * st.currentAmplitude;
+          
+          const pulseScale = 1.0 + 0.4 * Math.sin(st.time * 4);
+          const pulseScale2 = 1.0 + 0.3 * Math.sin(st.time * 4 + Math.PI / 2);
+          
+          // Outer pulsing ring
+          p.noFill();
+          p.stroke(st.currentColor);
+          p.strokeWeight(3);
+          p.circle(centerX, centerY, baseRadius * 2 * pulseScale);
+          
+          // Inner ring with different phase
+          p.strokeWeight(2);
+          p.circle(centerX, centerY, baseRadius * 1.5 * pulseScale2);
+          
+          // Center dot
+          p.fill(st.currentColor);
+          p.noStroke();
+          p.circle(centerX, centerY, 8);
+          
+          // Add heartbeat wave around the circle
+          p.noFill();
+          p.stroke(st.currentColor);
+          p.strokeWeight(2);
+          p.beginShape();
+          for (let angle = 0; angle < p.TWO_PI; angle += 0.05) {
+            const waveOffset = Math.sin(angle * 8 + st.phase * 2) * st.currentAmplitude * 0.5;
+            const r = baseRadius + waveOffset;
+            const x = centerX + p.cos(angle) * r;
+            const y = centerY + p.sin(angle) * r;
+            p.vertex(x, y);
           }
-          p.vertex(x, y);
+          p.endShape(p.CLOSE);
+        } else if (st.currentState === 'idle') {
+          // Idle state: gentle breathing circles
+          (p.drawingContext as CanvasRenderingContext2D).shadowBlur = 15;
+          (p.drawingContext as CanvasRenderingContext2D).shadowColor = st.currentColor.toString();
+          
+          const breatheScale = 1.0 + 0.1 * Math.sin(st.time * 2);
+          
+          // Outer breathing ring
+          p.noFill();
+          p.stroke(st.currentColor);
+          p.strokeWeight(2);
+          p.circle(centerX, centerY, baseRadius * 2 * breatheScale);
+          
+          // Inner ring
+          p.strokeWeight(1.5);
+          p.circle(centerX, centerY, baseRadius * 1.5 * breatheScale);
+          
+          // Center dot
+          p.fill(st.currentColor);
+          p.noStroke();
+          p.circle(centerX, centerY, 6);
+          
+          // Gentle wave
+          p.noFill();
+          p.stroke(st.currentColor);
+          p.strokeWeight(1);
+          p.beginShape();
+          for (let angle = 0; angle < p.TWO_PI; angle += 0.1) {
+            const waveOffset = Math.sin(angle * 4 + st.phase) * st.currentAmplitude * 0.3;
+            const r = baseRadius + waveOffset;
+            const x = centerX + p.cos(angle) * r;
+            const y = centerY + p.sin(angle) * r;
+            p.vertex(x, y);
+          }
+          p.endShape(p.CLOSE);
+        } else {
+          // Disconnected state: static gray circles
+          p.noFill();
+          p.stroke(st.currentColor);
+          p.strokeWeight(1);
+          p.circle(centerX, centerY, baseRadius * 2);
+          p.circle(centerX, centerY, baseRadius * 1.5);
+          
+          p.fill(st.currentColor);
+          p.noStroke();
+          p.circle(centerX, centerY, 4);
         }
-        p.endShape();
+        
         (p.drawingContext as CanvasRenderingContext2D).shadowBlur = 0;
       };
     };
