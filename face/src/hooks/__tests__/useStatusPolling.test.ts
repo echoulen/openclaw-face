@@ -5,7 +5,7 @@
  * Validates Requirements: 3.1, 3.2, 3.3, 3.4, 3.5
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach, test } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useStatusPolling } from '../useStatusPolling';
 import { AgentStatus } from '../../types';

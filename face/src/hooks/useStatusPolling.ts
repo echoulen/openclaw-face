@@ -90,7 +90,7 @@ export function useStatusPolling(
       setStatus(newStatus);
       
       // Update connection state on success (Requirement 3.5)
-      setConnectionState(prev => ({
+      setConnectionState(_prev => ({
         connected: true,
         lastSuccessTime: Date.now(),
         failureCount: 0,
@@ -215,7 +215,7 @@ export function useManualStatusPolling(
       
       setStatus(newStatus);
       
-      setConnectionState(prev => ({
+      setConnectionState(_prev => ({
         connected: true,
         lastSuccessTime: Date.now(),
         failureCount: 0,
