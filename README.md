@@ -24,7 +24,7 @@ A zero-port-exposure agent status visualization system using p5.js heartbeat ani
 
 ```bash
 # Install hook dependencies
-cd hooks/r2-status
+cd hooks/openclaw-face-status-hooks
 pnpm install
 
 # Install face dependencies
@@ -72,22 +72,18 @@ R2_ENDPOINT=https://your-account-id.r2.cloudflarestorage.com
 R2_BUCKET=openclaw-status-your-username
 ```
 
-### 4. Deploy the Hook
+### 4. Build the Hook
 
 ```bash
-cd hooks/r2-status
-./deploy.sh
+cd hooks/openclaw-face-status-hooks
+pnpm build
 ```
-
-This will:
-1. Compile TypeScript to JavaScript
-2. Copy the hook to OpenClaw's hooks directory
 
 ### 5. Enable the Hook
 
 ```bash
 cd /path/to/openclaw
-openclaw hooks enable r2-status
+openclaw hooks enable openclaw-face-status-hooks
 ```
 
 ### 6. Deploy the Face Dashboard
@@ -137,18 +133,12 @@ The R2 bucket must allow GET requests from any origin for the dashboard to work:
 
 ## Testing
 
-### Test Hook Push
+### Run Tests
 
 ```bash
-cd hooks/r2-status
-./test-push.sh
+cd hooks/openclaw-face-status-hooks
+pnpm test:run
 ```
-
-This script:
-1. Compiles the TypeScript hook
-2. Simulates `model_call` event (busy: true)
-3. Simulates `complete` event (busy: false)
-4. Verifies both pushes to R2
 
 ### Manual R2 Verification
 
@@ -242,13 +232,11 @@ openclaw-face/
 │   ├── deploy.sh            # Deployment script
 │   └── package.json
 ├── hooks/
-│   └── r2-status/           # OpenClaw hook
+│   └── openclaw-face-status-hooks/  # OpenClaw hook
 │       ├── index.ts         # Hook entry point
 │       ├── config.ts        # Configuration
 │       ├── uploader.ts      # R2 upload logic
 │       ├── types.ts         # TypeScript types
-│       ├── deploy.sh        # Deployment script
-│       ├── test-push.sh     # Test script
 │       └── __tests__/       # Tests
 └── r2-config.json           # R2 CORS configuration example
 ```
