@@ -156,12 +156,12 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
               p.vertex(centerX + p.cos(endAngle) * radius, 
                       centerY + p.sin(endAngle) * radius);
               
-              // Bright yellow flash
+              // Bright yellow flash - thinner
               p.stroke(255, 255, 0);
-              p.strokeWeight(2.5);
+              p.strokeWeight(1.5);
               p.endShape();
               
-              // Optional bright core for main flash
+              // Optional bright core for main flash - even thinner
               if (i === 0 && Math.random() < 0.5) {
                 p.beginShape();
                 p.vertex(centerX + p.cos(startAngle) * radius, 
@@ -180,7 +180,7 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
                         centerY + p.sin(endAngle) * radius);
                 
                 p.stroke(255, 255, 200);
-                p.strokeWeight(1);
+                p.strokeWeight(0.5);
                 p.endShape();
               }
             }
