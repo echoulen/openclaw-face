@@ -140,6 +140,49 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
             p.vertex(x, y);
           }
           p.endShape(p.CLOSE);
+          
+          // Electric arcs between points on the circle
+          if (Math.random() < 0.3) {
+            // Draw multiple layers for thickness
+            // Outer glow
+            p.stroke(255, 255, 255, 50);
+            p.strokeWeight(4);
+            
+            const arcStart = Math.random() * p.TWO_PI;
+            const arcEnd = arcStart + (Math.random() - 0.5) * p.PI;
+            const arcRadius = baseRadius * 1.8;
+            
+            drawArc(p, centerX, centerY, arcStart, arcEnd, arcRadius, 20);
+            
+            // Middle layer
+            p.stroke(255, 255, 255, 120);
+            p.strokeWeight(2.5);
+            drawArc(p, centerX, centerY, arcStart, arcEnd, arcRadius, 15);
+            
+            // Core line
+            p.stroke(255, 255, 255, 200);
+            p.strokeWeight(1.5);
+            drawArc(p, centerX, centerY, arcStart, arcEnd, arcRadius, 10);
+          }
+          
+          // Helper function to draw arc
+          function drawArc(p: p5, centerX: number, centerY: number, 
+                          startAngle: number, endAngle: number, 
+                          radius: number, jaggedness: number) {
+            p.beginShape();
+            
+            const segments = 5;
+            for (let i = 0; i <= segments; i++) {
+              const t = i / segments;
+              const angle = p.lerp(startAngle, endAngle, t);
+              const r = radius + (Math.random() - 0.5) * jaggedness;
+              const x = centerX + p.cos(angle) * r;
+              const y = centerY + p.sin(angle) * r;
+              p.vertex(x, y);
+            }
+            
+            p.endShape();
+          }
         } else if (st.currentState === 'idle') {
           // Idle state: gentle breathing circles with green-blue gradient
           (p.drawingContext as CanvasRenderingContext2D).shadowBlur = 15;
@@ -193,6 +236,40 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
             p.vertex(x, y);
           }
           p.endShape(p.CLOSE);
+          
+          // Occasional gentle arcs
+          if (Math.random() < 0.1) {
+            // Outer glow
+            p.stroke(255, 255, 255, 40);
+            p.strokeWeight(3);
+            
+            const arcStart = Math.random() * p.TWO_PI;
+            const arcEnd = arcStart + (Math.random() - 0.5) * p.PI * 0.5;
+            const arcRadius = baseRadius * 1.5 * breatheScale;
+            
+            drawIdleArc(p, centerX, centerY, arcStart, arcEnd, arcRadius, 8);
+            
+            // Core line
+            p.stroke(255, 255, 255, 100);
+            p.strokeWeight(1.5);
+            drawIdleArc(p, centerX, centerY, arcStart, arcEnd, arcRadius, 5);
+          }
+          
+          // Helper function for idle arcs
+          function drawIdleArc(p: p5, centerX: number, centerY: number, 
+                             startAngle: number, endAngle: number, 
+                             radius: number, jaggedness: number) {
+            p.beginShape();
+            const steps = 10;
+            for (let i = 0; i <= steps; i++) {
+              const angle = p.lerp(startAngle, endAngle, i / steps);
+              const r = radius + Math.sin(angle * 10 + st.time) * jaggedness;
+              const x = centerX + p.cos(angle) * r;
+              const y = centerY + p.sin(angle) * r;
+              p.vertex(x, y);
+            }
+            p.endShape();
+          }
         } else {
           // Disconnected state: static gray gradient circles
           const grayColors = [
