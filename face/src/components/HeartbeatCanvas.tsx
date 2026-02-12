@@ -92,10 +92,10 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
           
           // Define gradient colors for busy state
           const colors = [
-            p.color(255, 0, 100),   // Red
-            p.color(255, 100, 0),   // Orange
-            p.color(255, 200, 0),   // Yellow
-            p.color(255, 0, 200),   // Magenta
+            p.color(255, 140, 0),   // Dark orange
+            p.color(255, 165, 0),   // Orange
+            p.color(255, 200, 0),   // Yellow orange
+            p.color(255, 120, 0),   // Deep orange
           ];
           
           // Outer pulsing ring with gradient
@@ -114,74 +114,76 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
           p.strokeWeight(2);
           p.circle(centerX, centerY, baseRadius * 1.5 * pulseScale2);
           
-          // Center dot with gradient
+          // Simple center circle
           const centerGradient = p.lerpColor(colors[1], colors[3], (st.time * 2) % 1);
           p.fill(centerGradient);
           p.noStroke();
-          p.circle(centerX, centerY, baseRadius * 0.12); // Dynamic center dot size
+          p.circle(centerX, centerY, baseRadius * 0.12);
           
-          // RGB heartbeat wave around the circle
+          // Quick lightning flashes
           p.noFill();
-          p.strokeWeight(2);
-          p.beginShape();
-          for (let angle = 0; angle < p.TWO_PI; angle += 0.05) {
-            const waveOffset = Math.sin(angle * 8 + st.phase * 2) * st.currentAmplitude * 0.5;
-            const r = baseRadius + waveOffset;
-            const x = centerX + p.cos(angle) * r;
-            const y = centerY + p.sin(angle) * r;
-            
-            // Color based on angle position
-            const colorIndex = (angle / p.TWO_PI * colors.length) % colors.length;
-            const nextIndex = (colorIndex + 1) % colors.length;
-            const lerpAmount = (angle / p.TWO_PI * colors.length) % 1;
-            const waveColor = p.lerpColor(colors[Math.floor(colorIndex)], colors[Math.floor(nextIndex)], lerpAmount);
-            
-            p.stroke(waveColor);
-            p.vertex(x, y);
-          }
-          p.endShape(p.CLOSE);
           
-          // Electric arcs between points on the circle
-          if (Math.random() < 0.3) {
-            // Draw multiple layers for thickness
-            // Outer glow
-            p.stroke(255, 255, 255, 50);
-            p.strokeWeight(4);
+          // Random lightning strikes
+          if (Math.random() < 0.15) { // 15% chance per frame
+            // 1-3 quick flashes
+            const numFlashes = Math.floor(Math.random() * 3) + 1;
             
-            const arcStart = Math.random() * p.TWO_PI;
-            const arcEnd = arcStart + (Math.random() - 0.5) * p.PI;
-            const arcRadius = baseRadius * 1.8;
-            
-            drawArc(p, centerX, centerY, arcStart, arcEnd, arcRadius, 20);
-            
-            // Middle layer
-            p.stroke(255, 255, 255, 120);
-            p.strokeWeight(2.5);
-            drawArc(p, centerX, centerY, arcStart, arcEnd, arcRadius, 15);
-            
-            // Core line
-            p.stroke(255, 255, 255, 200);
-            p.strokeWeight(1.5);
-            drawArc(p, centerX, centerY, arcStart, arcEnd, arcRadius, 10);
-          }
-          
-          // Helper function to draw arc
-          function drawArc(p: p5, centerX: number, centerY: number, 
-                          startAngle: number, endAngle: number, 
-                          radius: number, jaggedness: number) {
-            p.beginShape();
-            
-            const segments = 5;
-            for (let i = 0; i <= segments; i++) {
-              const t = i / segments;
-              const angle = p.lerp(startAngle, endAngle, t);
-              const r = radius + (Math.random() - 0.5) * jaggedness;
-              const x = centerX + p.cos(angle) * r;
-              const y = centerY + p.sin(angle) * r;
-              p.vertex(x, y);
+            for (let i = 0; i < numFlashes; i++) {
+              // Random position
+              const startAngle = Math.random() * p.TWO_PI;
+              const arcLength = (Math.random() * 0.5 + 0.3) * Math.PI; // 0.3π to 0.8π
+              const endAngle = startAngle + (Math.random() > 0.5 ? arcLength : -arcLength);
+              const radius = baseRadius * (1.6 + Math.random() * 0.4);
+              
+              // Quick jagged lightning
+              p.beginShape();
+              p.vertex(centerX + p.cos(startAngle) * radius, 
+                      centerY + p.sin(startAngle) * radius);
+              
+              const segments = 4 + Math.floor(Math.random() * 4); // 4-7 segments
+              for (let j = 1; j < segments; j++) {
+                const t = j / segments;
+                const angle = p.lerp(startAngle, endAngle, t);
+                
+                // Sharp zigzag
+                const offset = (Math.random() - 0.5) * 30;
+                const r = radius + offset;
+                
+                p.vertex(centerX + p.cos(angle) * r, 
+                        centerY + p.sin(angle) * r);
+              }
+              
+              p.vertex(centerX + p.cos(endAngle) * radius, 
+                      centerY + p.sin(endAngle) * radius);
+              
+              // Bright yellow flash
+              p.stroke(255, 255, 0);
+              p.strokeWeight(2.5);
+              p.endShape();
+              
+              // Optional bright core for main flash
+              if (i === 0 && Math.random() < 0.5) {
+                p.beginShape();
+                p.vertex(centerX + p.cos(startAngle) * radius, 
+                        centerY + p.sin(startAngle) * radius);
+                
+                for (let j = 1; j < segments; j++) {
+                  const t = j / segments;
+                  const angle = p.lerp(startAngle, endAngle, t);
+                  const offset = (Math.random() - 0.5) * 15;
+                  const r = radius + offset;
+                  p.vertex(centerX + p.cos(angle) * r, 
+                          centerY + p.sin(angle) * r);
+                }
+                
+                p.vertex(centerX + p.cos(endAngle) * radius, 
+                        centerY + p.sin(endAngle) * radius);
+                
+                p.stroke(255, 255, 200);
+                p.strokeWeight(1);
+                p.endShape();
+              }
             }
-            
-            p.endShape();
           }
         } else if (st.currentState === 'idle') {
           // Idle state: gentle breathing circles with green-blue gradient
@@ -211,64 +213,53 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
           p.strokeWeight(1.5);
           p.circle(centerX, centerY, baseRadius * 1.5 * breatheScale);
           
-          // Center dot
-          const centerGradient = p.lerpColor(idleColors[1], idleColors[2], (st.time * 1.5) % 1);
+          // Simple center circle
+          const centerGradient = p.lerpColor(idleColors[0], idleColors[1], (Math.sin(st.time * 2) + 1) / 2);
           p.fill(centerGradient);
           p.noStroke();
-          p.circle(centerX, centerY, baseRadius * 0.1); // Dynamic center dot size
+          p.circle(centerX, centerY, baseRadius * 0.1);
           
-          // Gentle wave with gradient
+          // Gentle green lightning in idle mode
           p.noFill();
-          p.strokeWeight(1);
-          p.beginShape();
-          for (let angle = 0; angle < p.TWO_PI; angle += 0.1) {
-            const waveOffset = Math.sin(angle * 4 + st.phase) * st.currentAmplitude * 0.3;
-            const r = baseRadius + waveOffset;
-            const x = centerX + p.cos(angle) * r;
-            const y = centerY + p.sin(angle) * r;
-            
-            const colorIndex = (angle / p.TWO_PI * idleColors.length) % idleColors.length;
-            const nextIndex = (colorIndex + 1) % idleColors.length;
-            const lerpAmount = (angle / p.TWO_PI * idleColors.length) % 1;
-            const waveColor = p.lerpColor(idleColors[Math.floor(colorIndex)], idleColors[Math.floor(nextIndex)], lerpAmount);
-            
-            p.stroke(waveColor);
-            p.vertex(x, y);
-          }
-          p.endShape(p.CLOSE);
           
-          // Occasional gentle arcs
-          if (Math.random() < 0.1) {
-            // Outer glow
-            p.stroke(255, 255, 255, 40);
-            p.strokeWeight(3);
+          // Less frequent than busy mode
+          if (Math.random() < 0.08) { // 8% chance per frame
+            // 1-2 gentle flashes
+            const numFlashes = Math.random() < 0.7 ? 1 : 2;
             
-            const arcStart = Math.random() * p.TWO_PI;
-            const arcEnd = arcStart + (Math.random() - 0.5) * p.PI * 0.5;
-            const arcRadius = baseRadius * 1.5 * breatheScale;
-            
-            drawIdleArc(p, centerX, centerY, arcStart, arcEnd, arcRadius, 8);
-            
-            // Core line
-            p.stroke(255, 255, 255, 100);
-            p.strokeWeight(1.5);
-            drawIdleArc(p, centerX, centerY, arcStart, arcEnd, arcRadius, 5);
-          }
-          
-          // Helper function for idle arcs
-          function drawIdleArc(p: p5, centerX: number, centerY: number, 
-                             startAngle: number, endAngle: number, 
-                             radius: number, jaggedness: number) {
-            p.beginShape();
-            const steps = 10;
-            for (let i = 0; i <= steps; i++) {
-              const angle = p.lerp(startAngle, endAngle, i / steps);
-              const r = radius + Math.sin(angle * 10 + st.time) * jaggedness;
-              const x = centerX + p.cos(angle) * r;
-              const y = centerY + p.sin(angle) * r;
-              p.vertex(x, y);
+            for (let i = 0; i < numFlashes; i++) {
+              // Random position
+              const startAngle = Math.random() * p.TWO_PI;
+              const arcLength = (Math.random() * 0.3 + 0.2) * Math.PI; // Shorter arcs
+              const endAngle = startAngle + (Math.random() > 0.5 ? arcLength : -arcLength);
+              const radius = baseRadius * (1.5 + Math.random() * 0.3);
+              
+              // Gentle zigzag
+              p.beginShape();
+              p.vertex(centerX + p.cos(startAngle) * radius, 
+                      centerY + p.sin(startAngle) * radius);
+              
+              const segments = 3 + Math.floor(Math.random() * 3); // 3-5 segments
+              for (let j = 1; j < segments; j++) {
+                const t = j / segments;
+                const angle = p.lerp(startAngle, endAngle, t);
+                
+                // Smaller offset for gentler effect
+                const offset = (Math.random() - 0.5) * 15;
+                const r = radius + offset;
+                
+                p.vertex(centerX + p.cos(angle) * r, 
+                        centerY + p.sin(angle) * r);
+              }
+              
+              p.vertex(centerX + p.cos(endAngle) * radius, 
+                      centerY + p.sin(endAngle) * radius);
+              
+              // Green-tinted yellow
+              p.stroke(150, 255, 100);
+              p.strokeWeight(1.5);
+              p.endShape();
             }
-            p.endShape();
           }
         } else {
           // Disconnected state: static gray gradient circles
@@ -343,7 +334,7 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
           st.targetAmplitude = 30;
           break;
         case 'busy':
-          st.targetColor = p.color(244, 67, 54);
+          st.targetColor = p.color(255, 165, 0);  // Orange
           st.targetAmplitude = 40;
           break;
         case 'disconnected':
