@@ -72,10 +72,9 @@ export async function uploadStatus(payload: StatusPayload): Promise<void> {
 /**
  * OpenClaw HookHandler
  *
- * Listens for command events:
- * - command:new   → busy: true
- * - command:stop  → busy: false
- * - command:reset → busy: false
+ * Listens for all command events:
+ * - command:new → busy: true
+ * - any other   → busy: false
  */
 const handler = async (event: {
   type: string;
@@ -95,18 +94,7 @@ const handler = async (event: {
     return;
   }
 
-  let busy: boolean;
-  switch (event.action) {
-    case 'new':
-      busy = true;
-      break;
-    case 'stop':
-    case 'reset':
-      busy = false;
-      break;
-    default:
-      return;
-  }
+  const busy = event.action === 'new';
 
   const payload: StatusPayload = {
     busy,
