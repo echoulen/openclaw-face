@@ -69,10 +69,15 @@ describe('handler', () => {
       expect(mockSend).not.toHaveBeenCalled();
     });
 
-    it('should ignore unknown command actions', async () => {
+    it('should treat unknown command actions as busy: false', async () => {
       await handler(createEvent('unknown'));
       await new Promise((r) => setTimeout(r, 10));
-      expect(mockSend).not.toHaveBeenCalled();
+      expect(mockSend).toHaveBeenCalled();
+      const { PutObjectCommand } = await import('@aws-sdk/client-s3');
+      const calls = vi.mocked(PutObjectCommand).mock.calls;
+      const call = calls[calls.length - 1][0] as any;
+      const payload = JSON.parse(call.Body) as StatusPayload;
+      expect(payload.busy).toBe(false);
     });
   });
 

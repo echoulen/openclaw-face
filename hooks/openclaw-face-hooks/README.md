@@ -101,9 +101,9 @@ This hook listens to the following [OpenClaw events](https://docs.openclaw.ai/au
 
 | Event | Action |
 |-------|--------|
-| `command:new` | Upload `busy: true` |
-| `command:stop` | Upload `busy: false` |
-| `command:reset` | Upload `busy: false` |
+| `command` (general) | Listens to all command events |
+| `action: new` | Upload `busy: true` |
+| Any other action | Upload `busy: false` |
 
 ## Testing
 
