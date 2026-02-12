@@ -75,33 +75,46 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
         const centerY = st.height / 2;
         const baseRadius = 50;
 
-        // Draw circular heartbeat visualization
+        // Draw circular heartbeat visualization with RGB gradient
         if (st.currentState === 'busy') {
-          // Busy state: pulsing circles with glow
+          // Busy state: pulsing circles with RGB gradient
           (p.drawingContext as CanvasRenderingContext2D).shadowBlur = 30;
-          (p.drawingContext as CanvasRenderingContext2D).shadowColor = st.currentColor.toString();
           
           const pulseScale = 1.0 + 0.4 * Math.sin(st.time * 4);
           const pulseScale2 = 1.0 + 0.3 * Math.sin(st.time * 4 + Math.PI / 2);
           
-          // Outer pulsing ring
+          // Define gradient colors for busy state
+          const colors = [
+            p.color(255, 0, 100),   // Red
+            p.color(255, 100, 0),   // Orange
+            p.color(255, 200, 0),   // Yellow
+            p.color(255, 0, 200),   // Magenta
+          ];
+          
+          // Outer pulsing ring with gradient
           p.noFill();
-          p.stroke(st.currentColor);
-          p.strokeWeight(3);
-          p.circle(centerX, centerY, baseRadius * 2 * pulseScale);
+          for (let i = 0; i < colors.length; i++) {
+            const nextColor = colors[(i + 1) % colors.length];
+            const gradientColor = p.lerpColor(colors[i], nextColor, (st.time * 2 + i * 0.25) % 1);
+            p.stroke(gradientColor);
+            p.strokeWeight(3 - i * 0.5);
+            p.circle(centerX, centerY, baseRadius * 2 * pulseScale - i * 5);
+          }
           
           // Inner ring with different phase
+          const innerGradient = p.lerpColor(colors[0], colors[2], (Math.sin(st.time * 3) + 1) / 2);
+          p.stroke(innerGradient);
           p.strokeWeight(2);
           p.circle(centerX, centerY, baseRadius * 1.5 * pulseScale2);
           
-          // Center dot
-          p.fill(st.currentColor);
+          // Center dot with gradient
+          const centerGradient = p.lerpColor(colors[1], colors[3], (st.time * 2) % 1);
+          p.fill(centerGradient);
           p.noStroke();
           p.circle(centerX, centerY, 8);
           
-          // Add heartbeat wave around the circle
+          // RGB heartbeat wave around the circle
           p.noFill();
-          p.stroke(st.currentColor);
           p.strokeWeight(2);
           p.beginShape();
           for (let angle = 0; angle < p.TWO_PI; angle += 0.05) {
@@ -109,34 +122,53 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
             const r = baseRadius + waveOffset;
             const x = centerX + p.cos(angle) * r;
             const y = centerY + p.sin(angle) * r;
+            
+            // Color based on angle position
+            const colorIndex = (angle / p.TWO_PI * colors.length) % colors.length;
+            const nextIndex = (colorIndex + 1) % colors.length;
+            const lerpAmount = (angle / p.TWO_PI * colors.length) % 1;
+            const waveColor = p.lerpColor(colors[Math.floor(colorIndex)], colors[Math.floor(nextIndex)], lerpAmount);
+            
+            p.stroke(waveColor);
             p.vertex(x, y);
           }
           p.endShape(p.CLOSE);
         } else if (st.currentState === 'idle') {
-          // Idle state: gentle breathing circles
+          // Idle state: gentle breathing circles with green-blue gradient
           (p.drawingContext as CanvasRenderingContext2D).shadowBlur = 15;
-          (p.drawingContext as CanvasRenderingContext2D).shadowColor = st.currentColor.toString();
           
           const breatheScale = 1.0 + 0.1 * Math.sin(st.time * 2);
           
-          // Outer breathing ring
+          // Define gradient colors for idle state
+          const idleColors = [
+            p.color(0, 255, 100),   // Green
+            p.color(0, 200, 255),   // Cyan
+            p.color(100, 255, 200), // Light green
+          ];
+          
+          // Outer breathing ring with gradient
           p.noFill();
-          p.stroke(st.currentColor);
-          p.strokeWeight(2);
-          p.circle(centerX, centerY, baseRadius * 2 * breatheScale);
+          for (let i = 0; i < idleColors.length; i++) {
+            const gradientColor = p.lerpColor(idleColors[i], idleColors[(i + 1) % idleColors.length], (st.time + i * 0.3) % 1);
+            p.stroke(gradientColor);
+            p.strokeWeight(2 - i * 0.3);
+            p.circle(centerX, centerY, baseRadius * 2 * breatheScale - i * 3);
+          }
           
           // Inner ring
+          const innerGradient = p.lerpColor(idleColors[0], idleColors[1], (Math.sin(st.time * 1.5) + 1) / 2);
+          p.stroke(innerGradient);
           p.strokeWeight(1.5);
           p.circle(centerX, centerY, baseRadius * 1.5 * breatheScale);
           
           // Center dot
-          p.fill(st.currentColor);
+          const centerGradient = p.lerpColor(idleColors[1], idleColors[2], (st.time * 1.5) % 1);
+          p.fill(centerGradient);
           p.noStroke();
           p.circle(centerX, centerY, 6);
           
-          // Gentle wave
+          // Gentle wave with gradient
           p.noFill();
-          p.stroke(st.currentColor);
           p.strokeWeight(1);
           p.beginShape();
           for (let angle = 0; angle < p.TWO_PI; angle += 0.1) {
@@ -144,18 +176,33 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
             const r = baseRadius + waveOffset;
             const x = centerX + p.cos(angle) * r;
             const y = centerY + p.sin(angle) * r;
+            
+            const colorIndex = (angle / p.TWO_PI * idleColors.length) % idleColors.length;
+            const nextIndex = (colorIndex + 1) % idleColors.length;
+            const lerpAmount = (angle / p.TWO_PI * idleColors.length) % 1;
+            const waveColor = p.lerpColor(idleColors[Math.floor(colorIndex)], idleColors[Math.floor(nextIndex)], lerpAmount);
+            
+            p.stroke(waveColor);
             p.vertex(x, y);
           }
           p.endShape(p.CLOSE);
         } else {
-          // Disconnected state: static gray circles
-          p.noFill();
-          p.stroke(st.currentColor);
-          p.strokeWeight(1);
-          p.circle(centerX, centerY, baseRadius * 2);
-          p.circle(centerX, centerY, baseRadius * 1.5);
+          // Disconnected state: static gray gradient circles
+          const grayColors = [
+            p.color(100, 100, 100),
+            p.color(150, 150, 150),
+            p.color(200, 200, 200),
+          ];
           
-          p.fill(st.currentColor);
+          p.noFill();
+          for (let i = 0; i < grayColors.length; i++) {
+            p.stroke(grayColors[i]);
+            p.strokeWeight(1.5 - i * 0.3);
+            p.circle(centerX, centerY, baseRadius * 2 - i * 3);
+          }
+          
+          const centerGray = p.lerpColor(grayColors[0], grayColors[2], 0.5);
+          p.fill(centerGray);
           p.noStroke();
           p.circle(centerX, centerY, 4);
         }
