@@ -46,7 +46,7 @@ export const StatusDisplay: React.FC<StatusDisplayProps> = ({ status }) => {
         }}
       >
         <Typography variant="body2" color="text.secondary">
-          等待狀態資料...
+          Waiting for status data...
         </Typography>
       </Paper>
     );
@@ -65,7 +65,7 @@ export const StatusDisplay: React.FC<StatusDisplayProps> = ({ status }) => {
         {/* Last update time */}
         <Box>
           <Typography variant="caption" color="text.secondary">
-            更新時間
+            Last Updated
           </Typography>
           <Typography variant="body2">
             {formatTimestamp(status.ts)}
@@ -76,7 +76,7 @@ export const StatusDisplay: React.FC<StatusDisplayProps> = ({ status }) => {
         {status.source && (
           <Box>
             <Typography variant="caption" color="text.secondary">
-              來源
+              Source
             </Typography>
             <Typography variant="body1" sx={{ fontWeight: 500 }}>
               {status.source}

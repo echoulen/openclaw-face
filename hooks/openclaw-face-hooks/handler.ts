@@ -46,7 +46,7 @@ function getClient(): S3Client {
 export async function uploadStatus(payload: StatusPayload): Promise<void> {
   const bucket = process.env.R2_BUCKET;
   if (!bucket) {
-    console.error('[r2-status] R2_BUCKET not set, skipping upload');
+    console.error('[openclaw-face-hooks] R2_BUCKET not set, skipping upload');
     return;
   }
 
@@ -60,10 +60,10 @@ export async function uploadStatus(payload: StatusPayload): Promise<void> {
         CacheControl: 'no-cache',
       })
     );
-    console.log(`[r2-status] Uploaded status (busy: ${payload.busy})`);
+    console.log(`[openclaw-face-hooks] Uploaded status (busy: ${payload.busy})`);
   } catch (err) {
     console.error(
-      '[r2-status] Upload failed:',
+      '[openclaw-face-hooks] Upload failed:',
       err instanceof Error ? err.message : String(err)
     );
   }
@@ -89,6 +89,8 @@ const handler = async (event: {
     [key: string]: unknown;
   };
 }): Promise<void> => {
+  console.log(`[openclaw-face-hooks] Event received: type=${event.type}, action=${event.action}, sessionKey=${event.sessionKey}`);
+
   if (event.type !== 'command') {
     return;
   }
@@ -113,8 +115,8 @@ const handler = async (event: {
     source: event.context.commandSource,
   };
 
-  // Fire and forget — don't block command processing
-  void uploadStatus(payload);
+  // Await upload to ensure it completes before process exits (e.g. on /stop)
+  await uploadStatus(payload);
 };
 
 export default handler;

@@ -31,7 +31,7 @@ export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = ({
         {/* Failure count in dev mode */}
         {devMode && failureCount > 0 && (
           <Typography variant="caption" color="text.secondary">
-            (失敗次數: {failureCount})
+            (Failures: {failureCount})
           </Typography>
         )}
       </Box>
@@ -50,11 +50,11 @@ export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = ({
           },
         }}
       >
-        <AlertTitle>連線失敗</AlertTitle>
-        無法連線到 R2 儲存服務。請檢查網路連線或 R2 設定。
+        <AlertTitle>Connection Failed</AlertTitle>
+        Unable to connect to R2 storage. Please check your network or R2 configuration.
         {devMode && (
           <Typography variant="body2" sx={{ mt: 0.5, opacity: 0.8 }}>
-            連續失敗次數: {failureCount} 次
+            Consecutive failures: {failureCount}
           </Typography>
         )}
       </Alert>
@@ -63,13 +63,13 @@ export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = ({
       {devMode && (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Chip
-            label="離線"
+            label="Offline"
             color="error"
             size="small"
             sx={{ fontWeight: 500 }}
           />
           <Typography variant="caption" color="text.secondary">
-            嘗試重新連線中...
+            Reconnecting...
           </Typography>
         </Box>
       )}
