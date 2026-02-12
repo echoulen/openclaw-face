@@ -94,7 +94,7 @@ async function runTests() {
   const test1 = await testPush({ busy: true, model: 'claude-3-5-sonnet', taskId: 'test-task-001' });
   
   // Wait a moment
-  await new Promise(r => setTimeout(r, 1000));
+  await new Promise(r => setTimeout(r, 10000));
   
   console.log('');
   console.log('--- Test 2: Simulating complete event (busy: false) ---');
