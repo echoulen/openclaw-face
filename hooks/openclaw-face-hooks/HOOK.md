@@ -1,5 +1,5 @@
 ---
-name: r2-status
+name: openclaw-face-hooks
 description: "Push agent busy/idle status to Cloudflare R2 on command events"
 metadata:
   {

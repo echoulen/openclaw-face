@@ -1,5 +1,5 @@
 {
-  "name": "openclaw-face-hook",
+  "name": "openclaw-face-hooks",
   "version": "1.0.0",
   "description": "OpenClaw hook for pushing agent status to Cloudflare R2",
   "scripts": {
@@ -9,9 +9,9 @@
   },
   "keywords": [
     "openclaw",
-    "hook",
+    "hooks",
     "r2",
-    "status"
+    "face"
   ],
   "author": "",
   "license": "MIT",

@@ -24,7 +24,7 @@ A zero-port-exposure agent status visualization system using p5.js heartbeat ani
 
 ```bash
 # Install hook dependencies
-cd hooks/openclaw-face-status-hooks
+cd hooks/openclaw-face-hooks
 pnpm install
 
 # Install face dependencies
@@ -40,7 +40,7 @@ Create a bucket in Cloudflare R2 with the following settings:
 - **Public Access**: Enable (read-only)
 - **CORS Policy**: Allow GET from all origins
 
-#### CORS Configuration (r2-config.json)
+#### CORS Configuration
 
 ```json
 [
@@ -75,7 +75,7 @@ R2_BUCKET=openclaw-status-your-username
 ### 4. Enable the Hook
 
 ```bash
-openclaw hooks enable r2-status
+openclaw hooks enable openclaw-face-hooks
 ```
 
 ### 5. Deploy the Face Dashboard
@@ -128,7 +128,7 @@ The R2 bucket must allow GET requests from any origin for the dashboard to work:
 ### Run Tests
 
 ```bash
-cd hooks/openclaw-face-status-hooks
+cd hooks/openclaw-face-hooks
 pnpm test:run
 ```
 
@@ -224,12 +224,11 @@ openclaw-face/
 │   ├── deploy.sh            # Deployment script
 │   └── package.json
 ├── hooks/
-│   └── r2-status/           # OpenClaw hook
+│   └── openclaw-face-hooks/  # OpenClaw hook
 │       ├── HOOK.md          # Hook metadata (YAML frontmatter)
 │       ├── handler.ts       # HookHandler implementation
 │       ├── test-push.ts     # Integration test script
 │       └── __tests__/       # Unit & property tests
-└── r2-config.json           # R2 CORS configuration example
 ```
 
 ## Security
