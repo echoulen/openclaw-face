@@ -35,19 +35,19 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth="md" sx={{ py: 4 }}>
+      <Container maxWidth="md" sx={{ py: { xs: 1, sm: 1, md: 2 } }}>
         {/* Header */}
-        <Box sx={{ mb: 4, textAlign: 'center' }}>
-          <Typography variant="h4" component="h1" gutterBottom>
+        <Box sx={{ mb: { xs: 3, sm: 4 }, textAlign: 'center' }}>
+          <Typography variant="h4" component="h1" gutterBottom sx={{ fontSize: { xs: '2rem', sm: '2.5rem' } }}>
             OpenClaw Face
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body1" color="text.secondary" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
             Agent status visualization dashboard
           </Typography>
         </Box>
 
         {/* Connection indicator (Requirements 3.4, 7.4) */}
-        <Box sx={{ mb: 3 }}>
+        <Box>
           <ConnectionIndicator connectionState={connectionState} devMode={devMode} />
         </Box>
 
@@ -55,13 +55,14 @@ function App() {
         <Paper
           elevation={0}
           sx={{
-            p: 3,
+            p: { xs: 2, sm: 3 },
             backgroundColor: 'background.paper',
-            borderRadius: 2,
+            borderRadius: { xs: 1, sm: 2 },
+            mx: { xs: 1, sm: 0 },
           }}
         >
           {/* Heartbeat canvas (Requirements 4.1, 4.5, 4.6) */}
-          <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ mb: 0, display: 'flex', justifyContent: 'center' }}>
             <HeartbeatCanvas
               status={status}
               connectionState={connectionState}
@@ -75,8 +76,8 @@ function App() {
         </Paper>
 
         {/* Footer */}
-        <Box sx={{ mt: 4, textAlign: 'center' }}>
-          <Typography variant="caption" color="text.secondary">
+        <Box sx={{ mt: { xs: 3, sm: 4 }, textAlign: 'center' }}>
+          <Typography variant="caption" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
             Powered by Cloudflare R2 + p5.js
           </Typography>
         </Box>

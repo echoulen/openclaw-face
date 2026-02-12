@@ -28,14 +28,6 @@ export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = ({
   if (connected) {
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        {/* Connection status indicator */}
-        <Chip
-          label="已連線"
-          color="success"
-          size="small"
-          sx={{ fontWeight: 500 }}
-        />
-        
         {/* Failure count in dev mode */}
         {devMode && failureCount > 0 && (
           <Typography variant="caption" color="text.secondary">

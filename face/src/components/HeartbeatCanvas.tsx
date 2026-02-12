@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { Box } from '@mui/material';
 import p5 from 'p5';
 import { AgentStatus, ConnectionState } from '../types';
 
@@ -30,7 +31,13 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
 
     const sketch = (p: p5) => {
       p.setup = () => {
-        p.createCanvas(400, 200);
+        const container = containerRef.current;
+        if (!container) return;
+        
+        const width = container.clientWidth;
+        const height = Math.min(300, window.innerHeight * 0.4);
+        
+        p.createCanvas(width, height);
         p.frameRate(60);
         p.noFill();
         p.strokeWeight(2);
@@ -45,8 +52,8 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
           targetColor: p.color(76, 175, 80),
           currentAmplitude: 30,
           targetAmplitude: 30,
-          width: 400,
-          height: 200,
+          width: width,
+          height: height,
         };
       };
 
@@ -73,15 +80,15 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
 
         const centerX = st.width / 2;
         const centerY = st.height / 2;
-        const baseRadius = 50;
+        const baseRadius = Math.min(st.width, st.height) * 0.25; // Dynamic radius based on canvas size
 
         // Draw circular heartbeat visualization with RGB gradient
         if (st.currentState === 'busy') {
           // Busy state: pulsing circles with RGB gradient
           (p.drawingContext as CanvasRenderingContext2D).shadowBlur = 30;
           
-          const pulseScale = 1.0 + 0.4 * Math.sin(st.time * 4);
-          const pulseScale2 = 1.0 + 0.3 * Math.sin(st.time * 4 + Math.PI / 2);
+          const pulseScale = 1.0 + 0.5 * Math.sin(st.time * 4);
+          const pulseScale2 = 1.0 + 0.4 * Math.sin(st.time * 4 + Math.PI / 2);
           
           // Define gradient colors for busy state
           const colors = [
@@ -111,7 +118,7 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
           const centerGradient = p.lerpColor(colors[1], colors[3], (st.time * 2) % 1);
           p.fill(centerGradient);
           p.noStroke();
-          p.circle(centerX, centerY, 8);
+          p.circle(centerX, centerY, baseRadius * 0.12); // Dynamic center dot size
           
           // RGB heartbeat wave around the circle
           p.noFill();
@@ -165,7 +172,7 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
           const centerGradient = p.lerpColor(idleColors[1], idleColors[2], (st.time * 1.5) % 1);
           p.fill(centerGradient);
           p.noStroke();
-          p.circle(centerX, centerY, 6);
+          p.circle(centerX, centerY, baseRadius * 0.1); // Dynamic center dot size
           
           // Gentle wave with gradient
           p.noFill();
@@ -204,10 +211,22 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
           const centerGray = p.lerpColor(grayColors[0], grayColors[2], 0.5);
           p.fill(centerGray);
           p.noStroke();
-          p.circle(centerX, centerY, 4);
+          p.circle(centerX, centerY, baseRadius * 0.08); // Dynamic center dot size
         }
         
         (p.drawingContext as CanvasRenderingContext2D).shadowBlur = 0;
+      };
+
+      p.windowResized = () => {
+        const container = containerRef.current;
+        if (!container || !stateRef.current) return;
+        
+        const width = container.clientWidth;
+        const height = Math.min(300, window.innerHeight * 0.4);
+        
+        p.resizeCanvas(width, height);
+        stateRef.current.width = width;
+        stateRef.current.height = height;
       };
     };
 
@@ -259,17 +278,19 @@ export const HeartbeatCanvas: React.FC<HeartbeatCanvasProps> = ({
   }, [status, connectionState.connected]);
 
   return (
-    <div
+    <Box
       ref={containerRef}
-      style={{
+      sx={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: '16px',
+        p: { xs: 1.5, sm: 2 },
         backgroundColor: '#1e1e1e',
-        borderRadius: '8px',
+        borderRadius: { xs: 1, sm: 1.5 },
         width: '100%',
-        minHeight: '232px',
+        minHeight: { xs: '150px', sm: '200px' },
+        maxWidth: '100%',
+        overflow: 'hidden',
       }}
     />
   );
