@@ -27,9 +27,9 @@ const formatTimestamp = (ts: number): string => {
  * StatusDisplay - React component that displays agent status information
  * 
  * Features:
- * - Shows current model name
  * - Shows latest update time (formatted)
- * - Shows taskId (if exists)
+ * - Shows source channel (if exists)
+ * - Shows session key (if exists)
  * - Uses MUI Typography components
  * 
  * Requirements: 4.5, 4.6
@@ -62,16 +62,6 @@ export const StatusDisplay: React.FC<StatusDisplayProps> = ({ status }) => {
       }}
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-        {/* Model name */}
-        <Box>
-          <Typography variant="caption" color="text.secondary">
-            模型
-          </Typography>
-          <Typography variant="body1" sx={{ fontWeight: 500 }}>
-            {status.model || 'Unknown'}
-          </Typography>
-        </Box>
-
         {/* Last update time */}
         <Box>
           <Typography variant="caption" color="text.secondary">
@@ -82,11 +72,23 @@ export const StatusDisplay: React.FC<StatusDisplayProps> = ({ status }) => {
           </Typography>
         </Box>
 
-        {/* Task ID (if exists) */}
-        {status.taskId && (
+        {/* Source channel (if exists) */}
+        {status.source && (
           <Box>
             <Typography variant="caption" color="text.secondary">
-              任務 ID
+              來源
+            </Typography>
+            <Typography variant="body1" sx={{ fontWeight: 500 }}>
+              {status.source}
+            </Typography>
+          </Box>
+        )}
+
+        {/* Session key (if exists) */}
+        {status.sessionKey && (
+          <Box>
+            <Typography variant="caption" color="text.secondary">
+              Session
             </Typography>
             <Typography
               variant="body2"
@@ -96,7 +98,7 @@ export const StatusDisplay: React.FC<StatusDisplayProps> = ({ status }) => {
                 wordBreak: 'break-all',
               }}
             >
-              {status.taskId}
+              {status.sessionKey}
             </Typography>
           </Box>
         )}

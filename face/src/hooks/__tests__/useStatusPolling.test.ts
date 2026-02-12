@@ -33,8 +33,8 @@ describe('useStatusPolling', () => {
     test('should fetch status immediately on mount', () => {
       const mockStatus: AgentStatus = {
         busy: false,
-        model: 'claude-3-5-sonnet',
         ts: Date.now(),
+        sessionKey: 'agent:main:main',
       };
       
       mockFetch.mockResolvedValueOnce({
@@ -55,8 +55,8 @@ describe('useStatusPolling', () => {
     test('should poll at specified interval', () => {
       const mockStatus: AgentStatus = {
         busy: true,
-        model: 'claude-3-5-sonnet',
         ts: Date.now(),
+        sessionKey: 'agent:main:main',
       };
       
       mockFetch.mockResolvedValue({
@@ -87,9 +87,9 @@ describe('useStatusPolling', () => {
     test('should call fetch with correct URL and headers', () => {
       const mockStatus: AgentStatus = {
         busy: false,
-        model: 'claude-3-5-sonnet',
         ts: 1704067200000,
-        taskId: 'task-123',
+        sessionKey: 'agent:main:main',
+        source: 'telegram',
       };
       
       mockFetch.mockResolvedValueOnce({
@@ -194,7 +194,7 @@ describe('useStatusPolling', () => {
     test('should stop polling on unmount', () => {
       mockFetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ busy: false, model: 'test', ts: Date.now() }),
+        json: () => Promise.resolve({ busy: false, ts: Date.now() }),
       });
       
       const { unmount } = renderHook(() => useStatusPolling('https://test.com/status.json', 5000, 3));
@@ -240,7 +240,7 @@ describe('useStatusPolling - Property-Based Tests', () => {
         callTimes.push(Date.now());
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({ busy: false, model: 'test', ts: Date.now() }),
+          json: () => Promise.resolve({ busy: false, ts: Date.now() }),
         });
       });
       
@@ -264,8 +264,8 @@ describe('useStatusPolling - Property-Based Tests', () => {
     test('should always reset failureCount to 0 on success', () => {
       const mockStatus: AgentStatus = {
         busy: false,
-        model: 'test-model',
         ts: Date.now(),
+        sessionKey: 'agent:main:main',
       };
       
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
@@ -298,9 +298,9 @@ describe('useStatusPolling - Property-Based Tests', () => {
     test('should preserve status after successful fetch', () => {
       const mockStatus: AgentStatus = {
         busy: true,
-        model: 'claude-3-5-sonnet',
         ts: Date.now(),
-        taskId: 'test-task-123',
+        sessionKey: 'agent:main:main',
+        source: 'telegram',
       };
       
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({

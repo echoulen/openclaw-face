@@ -7,9 +7,9 @@
  */
 export interface AgentStatus {
   busy: boolean;
-  model: string;
   ts: number;
-  taskId?: string;
+  sessionKey?: string;
+  source?: string;
 }
 
 /**

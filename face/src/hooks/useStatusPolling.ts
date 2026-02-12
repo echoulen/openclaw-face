@@ -75,16 +75,16 @@ export function useStatusPolling(
       const data = await response.json();
       
       // Validate required fields
-      if (typeof data.busy !== 'boolean' || typeof data.model !== 'string' || typeof data.ts !== 'number') {
+      if (typeof data.busy !== 'boolean' || typeof data.ts !== 'number') {
         throw new Error('Invalid status format: missing required fields');
       }
       
       // Update status with parsed data
       const newStatus: AgentStatus = {
         busy: data.busy,
-        model: data.model,
         ts: data.ts,
-        taskId: data.taskId,
+        sessionKey: data.sessionKey,
+        source: data.source,
       };
       
       setStatus(newStatus);
@@ -202,15 +202,15 @@ export function useManualStatusPolling(
       
       const data = await response.json();
       
-      if (typeof data.busy !== 'boolean' || typeof data.model !== 'string' || typeof data.ts !== 'number') {
+      if (typeof data.busy !== 'boolean' || typeof data.ts !== 'number') {
         throw new Error('Invalid status format: missing required fields');
       }
       
       const newStatus: AgentStatus = {
         busy: data.busy,
-        model: data.model,
         ts: data.ts,
-        taskId: data.taskId,
+        sessionKey: data.sessionKey,
+        source: data.source,
       };
       
       setStatus(newStatus);
