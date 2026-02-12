@@ -72,21 +72,13 @@ R2_ENDPOINT=https://your-account-id.r2.cloudflarestorage.com
 R2_BUCKET=openclaw-status-your-username
 ```
 
-### 4. Build the Hook
+### 4. Enable the Hook
 
 ```bash
-cd hooks/openclaw-face-status-hooks
-pnpm build
+openclaw hooks enable r2-status
 ```
 
-### 5. Enable the Hook
-
-```bash
-cd /path/to/openclaw
-openclaw hooks enable openclaw-face-status-hooks
-```
-
-### 6. Deploy the Face Dashboard
+### 5. Deploy the Face Dashboard
 
 ```bash
 cd face
@@ -153,9 +145,9 @@ Expected response:
 ```json
 {
   "busy": true,
-  "model": "claude-3-5-sonnet",
   "ts": 1704067200000,
-  "taskId": "task-abc-123"
+  "sessionKey": "agent:main:main",
+  "source": "telegram"
 }
 ```
 
@@ -168,8 +160,8 @@ openclaw start
 ```
 
 The hook will automatically:
-1. Push `busy: true` when a model call starts
-2. Push `busy: false` when the call completes
+1. Push `busy: true` on `/new` command
+2. Push `busy: false` on `/stop` or `/reset` command
 
 ### View Dashboard
 
@@ -232,12 +224,11 @@ openclaw-face/
 │   ├── deploy.sh            # Deployment script
 │   └── package.json
 ├── hooks/
-│   └── openclaw-face-status-hooks/  # OpenClaw hook
-│       ├── index.ts         # Hook entry point
-│       ├── config.ts        # Configuration
-│       ├── uploader.ts      # R2 upload logic
-│       ├── types.ts         # TypeScript types
-│       └── __tests__/       # Tests
+│   └── r2-status/           # OpenClaw hook
+│       ├── HOOK.md          # Hook metadata (YAML frontmatter)
+│       ├── handler.ts       # HookHandler implementation
+│       ├── test-push.ts     # Integration test script
+│       └── __tests__/       # Unit & property tests
 └── r2-config.json           # R2 CORS configuration example
 ```
 
