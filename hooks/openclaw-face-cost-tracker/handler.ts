@@ -12,20 +12,25 @@ import * as path from 'path';
 import * as os from 'os';
 import { createReadStream } from 'fs';
 import { createInterface } from 'readline';
-// @ts-ignore
-import pricing from './pricing.json';
-
-config();
+// @ts-ignore - JSON import
+import MODEL_PRICING from './pricing.json' assert { type: 'json' };
 
 /**
- * Model pricing loaded from JSON file
+ * Model pricing structure
  */
-const MODEL_PRICING: Record<string, {
+type ModelPricing = {
   input: number;
   output: number;
   cacheWrite: number;
   cacheRead: number;
-}> = pricing;
+};
+
+/**
+ * Model pricing loaded from JSON file
+ */
+const PRICING: Record<string, ModelPricing> = MODEL_PRICING;
+
+config();
 
 /**
  * Cost payload structure
@@ -122,7 +127,7 @@ export function calculateCost(tokenBreakdown: {
   cacheWrite: number;
   cacheRead: number;
 }, model: string): { total: number; breakdown: Record<string, number> } {
-  const pricing = MODEL_PRICING[model];
+  const pricing = PRICING[model];
   if (!pricing) {
     console.error(`[openclaw-face-cost-tracker] No pricing found for model: ${model}`);
     return { total: 0, breakdown: { input: 0, output: 0, cacheWrite: 0, cacheRead: 0 } };
