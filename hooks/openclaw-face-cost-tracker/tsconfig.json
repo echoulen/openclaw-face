@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": false,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "paths": {
+      "./pricing.json": ["./pricing.json"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.json"],
+  "exclude": ["node_modules", "__tests__"]
+}
