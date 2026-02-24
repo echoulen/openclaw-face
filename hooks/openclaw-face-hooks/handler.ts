@@ -25,6 +25,11 @@ export interface StatusPayload {
  */
 let client: S3Client | null = null;
 
+/**
+ * Timer for resetting busy status after 30 seconds of inactivity
+ */
+let busyResetTimer: NodeJS.Timeout | null = null;
+
 function getClient(): S3Client {
   if (!client) {
     client = new S3Client({
@@ -73,8 +78,8 @@ export async function uploadStatus(payload: StatusPayload): Promise<void> {
  * OpenClaw HookHandler
  *
  * Listens for all message events:
- * - message:received → busy: true
- * - message:sent     → busy: false
+ * - message:received → busy: true (resets 30s timer to set busy: false)
+ * - message:sent     → busy: false (immediately)
  */
 const handler = async (event: {
   type: string;
@@ -94,16 +99,68 @@ const handler = async (event: {
     return;
   }
 
-  const busy = event.action === 'received';
+  // Handle message:sent - immediately set busy: false
+  if (event.action === 'sent') {
+    // Clear any existing timer
+    if (busyResetTimer) {
+      clearTimeout(busyResetTimer);
+      busyResetTimer = null;
+    }
 
+    const payload: StatusPayload = {
+      busy: false,
+      ts: event.timestamp.getTime(),
+      sessionKey: event.sessionKey,
+      source: event.context.commandSource,
+    };
+
+    await uploadStatus(payload);
+    return;
+  }
+
+  // Handle message:received - set busy: true and schedule reset to false after 30s
+  if (event.action === 'received') {
+    // Clear existing timer if any
+    if (busyResetTimer) {
+      clearTimeout(busyResetTimer);
+    }
+
+    // Immediately set busy: true
+    const payload: StatusPayload = {
+      busy: true,
+      ts: event.timestamp.getTime(),
+      sessionKey: event.sessionKey,
+      source: event.context.commandSource,
+    };
+
+    await uploadStatus(payload);
+
+    // Schedule busy: false after 30 seconds
+    busyResetTimer = setTimeout(async () => {
+      console.log('[openclaw-face-hooks] 30 seconds elapsed, setting busy: false');
+      
+      const resetPayload: StatusPayload = {
+        busy: false,
+        ts: Date.now(),
+        sessionKey: event.sessionKey,
+        source: event.context.commandSource,
+      };
+
+      await uploadStatus(resetPayload);
+      busyResetTimer = null;
+    }, 30000); // 30 seconds
+
+    return;
+  }
+
+  // Handle unknown message actions - treat as busy: false
   const payload: StatusPayload = {
-    busy,
+    busy: false,
     ts: event.timestamp.getTime(),
     sessionKey: event.sessionKey,
     source: event.context.commandSource,
   };
 
-  // Await upload to ensure it completes before process exits (e.g. on /stop)
   await uploadStatus(payload);
 };
 
