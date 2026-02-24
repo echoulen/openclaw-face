@@ -77,14 +77,14 @@ describe('StatusPayload properties', () => {
   });
 
   describe('busy state mapping', () => {
-    itProperty('command:new always maps to busy: true',
+    itProperty('message:received always maps to busy: true',
       fc.property(timestampArb, sessionKeyArb, sourceArb, (ts, sessionKey, source) => {
         const payload: StatusPayload = { busy: true, ts, sessionKey, source };
         return payload.busy === true;
       })
     );
 
-    itProperty('command:stop always maps to busy: false',
+    itProperty('message:sent always maps to busy: false',
       fc.property(timestampArb, sessionKeyArb, sourceArb, (ts, sessionKey, source) => {
         const payload: StatusPayload = { busy: false, ts, sessionKey, source };
         return payload.busy === false;

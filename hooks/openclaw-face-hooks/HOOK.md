@@ -1,12 +1,12 @@
 ---
 name: openclaw-face-hooks
-description: "Push agent busy/idle status to Cloudflare R2 on command events"
+description: "Push agent busy/idle status to Cloudflare R2 on message events"
 metadata:
   {
     "openclaw":
       {
         "emoji": "📡",
-        "events": ["command"],
+        "events": ["message"],
         "requires": { "env": ["R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_ENDPOINT", "R2_BUCKET"] },
       },
   }
@@ -14,12 +14,12 @@ metadata:
 
 # R2 Status Hook
 
-Pushes agent busy/idle status to Cloudflare R2 as `status.json` on command events. Designed for zero-port-exposure status visualization — a GitHub Pages dashboard polls R2 to display real-time agent state.
+Pushes agent busy/idle status to Cloudflare R2 as `status.json` on message events. Designed for zero-port-exposure status visualization — a GitHub Pages dashboard polls R2 to display real-time agent state.
 
 ## What It Does
 
-- On `/new` command → uploads `{ "busy": true, ... }` to R2
-- On `/stop` or `/reset` command → uploads `{ "busy": false, ... }` to R2
+- On `message:received` event → uploads `{ "busy": true, ... }` to R2
+- On `message:sent` event → uploads `{ "busy": false, ... }` to R2
 - Upload failures are caught and logged — they never interrupt OpenClaw operation
 
 ## Status JSON Schema

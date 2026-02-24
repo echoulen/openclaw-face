@@ -1,18 +1,18 @@
 # openclaw-face-hooks
 
-OpenClaw hook that pushes agent busy/idle status to Cloudflare R2 on command events. Designed for zero-port-exposure status visualization.
+OpenClaw hook that pushes agent busy/idle status to Cloudflare R2 on message events. Designed for zero-port-exposure status visualization.
 
 ## How It Works
 
 ```
-┌─────────────┐  command:new   ┌──────────────┐  PUT status.json  ┌────────────────┐
-│  OpenClaw    │──────────────▶│  This Hook   │─────────────────▶│  Cloudflare R2 │
-│  (Agent)    │  command:stop  │  (handler.ts)│                  │  (Public)      │
-└─────────────┘  command:reset └──────────────┘                  └────────────────┘
+┌─────────────┐  message:received  ┌──────────────┐  PUT status.json  ┌────────────────┐
+│  OpenClaw    │───────────────────▶│  This Hook   │─────────────────▶│  Cloudflare R2 │
+│  (Agent)    │  message:sent      │  (handler.ts)│                  │  (Public)      │
+└─────────────┘                    └──────────────┘                  └────────────────┘
 ```
 
-- `/new` command → uploads `{ "busy": true, ... }`
-- `/stop` or `/reset` command → uploads `{ "busy": false, ... }`
+- `message:received` event → uploads `{ "busy": true, ... }`
+- `message:sent` event → uploads `{ "busy": false, ... }`
 - Errors are logged but never interrupt OpenClaw operation
 
 ## Installation
@@ -93,7 +93,7 @@ The hook uploads the following JSON to `status.json` in your R2 bucket:
 | `busy` | `boolean` | `true` when agent is processing, `false` when idle |
 | `ts` | `number` | Unix timestamp in milliseconds |
 | `sessionKey` | `string?` | Session identifier |
-| `source` | `string?` | Command source channel (e.g., `telegram`, `whatsapp`) |
+| `source` | `string?` | Message source channel (e.g., `telegram`, `whatsapp`) |
 
 ## Events
 
@@ -101,9 +101,9 @@ This hook listens to the following [OpenClaw events](https://docs.openclaw.ai/au
 
 | Event | Action |
 |-------|--------|
-| `command` (general) | Listens to all command events |
-| `action: new` | Upload `busy: true` |
-| Any other action | Upload `busy: false` |
+| `message` (general) | Listens to all message events |
+| `action: received` | Upload `busy: true` |
+| `action: sent` | Upload `busy: false` |
 
 ## Testing
 
@@ -119,7 +119,7 @@ pnpm test:run
 pnpm test:push
 ```
 
-This simulates command events and pushes status to your R2 bucket.
+This simulates message events and pushes status to your R2 bucket.
 
 ## Project Structure
 

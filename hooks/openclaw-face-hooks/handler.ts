@@ -72,9 +72,9 @@ export async function uploadStatus(payload: StatusPayload): Promise<void> {
 /**
  * OpenClaw HookHandler
  *
- * Listens for all command events:
- * - command:new → busy: true
- * - any other   → busy: false
+ * Listens for all message events:
+ * - message:received → busy: true
+ * - message:sent     → busy: false
  */
 const handler = async (event: {
   type: string;
@@ -90,11 +90,11 @@ const handler = async (event: {
 }): Promise<void> => {
   console.log(`[openclaw-face-hooks] Event received: type=${event.type}, action=${event.action}, sessionKey=${event.sessionKey}`);
 
-  if (event.type !== 'command') {
+  if (event.type !== 'message') {
     return;
   }
 
-  const busy = event.action === 'new';
+  const busy = event.action === 'received';
 
   const payload: StatusPayload = {
     busy,

@@ -32,7 +32,7 @@ describe('handler', () => {
     delete process.env.R2_SECRET_ACCESS_KEY;
   });
 
-  function createEvent(action: string, type = 'command') {
+  function createEvent(action: string, type = 'message') {
     return {
       type,
       action,
@@ -44,32 +44,26 @@ describe('handler', () => {
   }
 
   describe('event filtering', () => {
-    it('should handle command:new events', async () => {
-      await handler(createEvent('new'));
+    it('should handle message:received events', async () => {
+      await handler(createEvent('received'));
       // Fire-and-forget, give it a tick
       await new Promise((r) => setTimeout(r, 10));
       expect(mockSend).toHaveBeenCalled();
     });
 
-    it('should handle command:stop events', async () => {
-      await handler(createEvent('stop'));
+    it('should handle message:sent events', async () => {
+      await handler(createEvent('sent'));
       await new Promise((r) => setTimeout(r, 10));
       expect(mockSend).toHaveBeenCalled();
     });
 
-    it('should handle command:reset events', async () => {
-      await handler(createEvent('reset'));
-      await new Promise((r) => setTimeout(r, 10));
-      expect(mockSend).toHaveBeenCalled();
-    });
-
-    it('should ignore non-command events', async () => {
+    it('should ignore non-message events', async () => {
       await handler(createEvent('bootstrap', 'agent'));
       await new Promise((r) => setTimeout(r, 10));
       expect(mockSend).not.toHaveBeenCalled();
     });
 
-    it('should treat unknown command actions as busy: false', async () => {
+    it('should treat unknown message actions as busy: false', async () => {
       await handler(createEvent('unknown'));
       await new Promise((r) => setTimeout(r, 10));
       expect(mockSend).toHaveBeenCalled();
@@ -82,8 +76,8 @@ describe('handler', () => {
   });
 
   describe('busy state mapping', () => {
-    it('command:new should set busy: true', async () => {
-      await handler(createEvent('new'));
+    it('message:received should set busy: true', async () => {
+      await handler(createEvent('received'));
       await new Promise((r) => setTimeout(r, 10));
 
       const { PutObjectCommand } = await import('@aws-sdk/client-s3');
@@ -92,19 +86,8 @@ describe('handler', () => {
       expect(payload.busy).toBe(true);
     });
 
-    it('command:stop should set busy: false', async () => {
-      await handler(createEvent('stop'));
-      await new Promise((r) => setTimeout(r, 10));
-
-      const { PutObjectCommand } = await import('@aws-sdk/client-s3');
-      const calls = vi.mocked(PutObjectCommand).mock.calls;
-      const call = calls[calls.length - 1][0] as any;
-      const payload = JSON.parse(call.Body) as StatusPayload;
-      expect(payload.busy).toBe(false);
-    });
-
-    it('command:reset should set busy: false', async () => {
-      await handler(createEvent('reset'));
+    it('message:sent should set busy: false', async () => {
+      await handler(createEvent('sent'));
       await new Promise((r) => setTimeout(r, 10));
 
       const { PutObjectCommand } = await import('@aws-sdk/client-s3');
@@ -117,7 +100,7 @@ describe('handler', () => {
 
   describe('payload structure', () => {
     it('should include sessionKey and source from event', async () => {
-      await handler(createEvent('new'));
+      await handler(createEvent('received'));
       await new Promise((r) => setTimeout(r, 10));
 
       const { PutObjectCommand } = await import('@aws-sdk/client-s3');
