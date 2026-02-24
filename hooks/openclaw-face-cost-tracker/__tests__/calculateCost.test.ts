@@ -1,8 +1,14 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { calculateCost } from '../handler.js';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+
+// Mock console
+const consoleSpy = {
+  log: vi.spyOn(console, 'log').mockImplementation(() => {}),
+  error: vi.spyOn(console, 'error').mockImplementation(() => {})
+};
 
 // Mock pricing data for testing
 const mockPricing = {
@@ -50,17 +56,37 @@ describe('calculateCost', () => {
   });
 
   it('should return zero cost for unknown model', () => {
-    const tokenBreakdown = {
+    const result = calculateCost({
       input: 1000,
       output: 500,
-      cacheWrite: 0,
-      cacheRead: 0
-    };
-    
-    const result = calculateCost(tokenBreakdown, 'non-existent-model');
+      cacheWrite: 100,
+      cacheRead: 200
+    }, 'non-existent-model');
     
     expect(result.total).toBe(0);
-    expect(result.breakdown).toEqual({ input: 0, output: 0, cacheWrite: 0, cacheRead: 0 });
+    expect(consoleSpy.error).toHaveBeenCalledWith(
+      '[openclaw-face-cost-tracker] No pricing found for model: non-existent-model'
+    );
+  });
+
+  it('should skip cost calculation for delivery-mirror model', () => {
+    const result = calculateCost({
+      input: 1000,
+      output: 500,
+      cacheWrite: 100,
+      cacheRead: 200
+    }, 'delivery-mirror');
+    
+    expect(result.total).toBe(0);
+    expect(result.breakdown).toEqual({
+      input: 0,
+      output: 0,
+      cacheWrite: 0,
+      cacheRead: 0
+    });
+    expect(consoleSpy.log).toHaveBeenCalledWith(
+      '[openclaw-face-cost-tracker] Skipping cost calculation for internal model: delivery-mirror'
+    );
   });
 
   it('should handle zero tokens', () => {

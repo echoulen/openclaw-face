@@ -37,7 +37,7 @@ pnpm test:push
 2. **Timer Reset**: If another message is received within that minute, the timer resets
 3. **Cost Calculation**: After 1 minute of inactivity, the hook:
    - Reads JSONL session files from `~/.openclaw/agents/main/sessions/`
-   - Parses usage data from the last hour
+   - Parses usage data from the last 30 days
    - Calculates costs using model-specific pricing
    - Uploads results to R2 as `cost.json`
 

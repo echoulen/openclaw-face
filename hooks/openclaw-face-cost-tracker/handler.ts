@@ -208,6 +208,12 @@ export function calculateCost(tokenBreakdown: {
   cacheWrite: number;
   cacheRead: number;
 }, model: string): { total: number; breakdown: Record<string, number> } {
+  // Skip billing for internal delivery-mirror model
+  if (model === 'delivery-mirror' || model.includes('delivery-mirror')) {
+    console.log(`[openclaw-face-cost-tracker] Skipping cost calculation for internal model: ${model}`);
+    return { total: 0, breakdown: { input: 0, output: 0, cacheWrite: 0, cacheRead: 0 } };
+  }
+
   const pricing = getPricing()[model];
   if (!pricing) {
     console.error(`[openclaw-face-cost-tracker] No pricing found for model: ${model}`);
@@ -356,8 +362,8 @@ async function calculateRecentCosts(sessionKey: string): Promise<CostPayload | n
     const files = fs.readdirSync(sessionDir).filter(f => f.endsWith('.jsonl'));
     console.log(`[openclaw-face-cost-tracker] Found ${files.length} .jsonl files`);
     
-    // Get all session costs from the last hour
-    const oneHourAgo = Date.now() - (60 * 60 * 1000);
+    // Get all session costs from the last 30 days
+    const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
     let totalCost = 0;
     let totalMessages = 0;
     let lastMessageTime = '';
@@ -374,8 +380,8 @@ async function calculateRecentCosts(sessionKey: string): Promise<CostPayload | n
       const filePath = path.join(sessionDir, file);
       const stats = fs.statSync(filePath);
       
-      // Only check recent files
-      if (stats.mtime.getTime() > oneHourAgo) {
+      // Only check recent files (last 30 days)
+      if (stats.mtime.getTime() > thirtyDaysAgo) {
         const sessionCost = await parseJsonlFile(filePath);
         
         if (sessionCost) {
@@ -411,7 +417,7 @@ async function calculateRecentCosts(sessionKey: string): Promise<CostPayload | n
     }
 
     if (totalMessages === 0) {
-      console.log('[openclaw-face-cost-tracker] No messages found in the last hour');
+      console.log('[openclaw-face-cost-tracker] No messages found in the last 30 days');
       return null;
     }
 
