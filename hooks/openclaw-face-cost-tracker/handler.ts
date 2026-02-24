@@ -28,32 +28,89 @@ type ModelPricing = {
 /**
  * Model pricing loaded from JSON file
  */
-let PRICING: Record<string, ModelPricing> | null = null;
+const PRICING: Record<string, ModelPricing> = {
+  "claude-opus-4-5-20251101": {
+    "input": 15.00,
+    "output": 75.00,
+    "cacheWrite": 18.75,
+    "cacheRead": 1.50
+  },
+  "claude-sonnet-4-5-20251101": {
+    "input": 3.00,
+    "output": 15.00,
+    "cacheWrite": 3.75,
+    "cacheRead": 0.30
+  },
+  "claude-haiku-4-5-20251001": {
+    "input": 0.80,
+    "output": 4.00,
+    "cacheWrite": 1.00,
+    "cacheRead": 0.08
+  },
+  "anthropic/claude-opus-4-5": {
+    "input": 15.00,
+    "output": 75.00,
+    "cacheWrite": 18.75,
+    "cacheRead": 1.50
+  },
+  "anthropic/claude-sonnet-4-5": {
+    "input": 3.00,
+    "output": 15.00,
+    "cacheWrite": 3.75,
+    "cacheRead": 0.30
+  },
+  "anthropic/claude-sonnet-4": {
+    "input": 3.00,
+    "output": 15.00,
+    "cacheWrite": 3.75,
+    "cacheRead": 0.30
+  },
+  "anthropic/claude-opus-4": {
+    "input": 15.00,
+    "output": 75.00,
+    "cacheWrite": 18.75,
+    "cacheRead": 1.50
+  },
+  "anthropic/claude-3-5-sonnet-20241022": {
+    "input": 3.00,
+    "output": 15.00,
+    "cacheWrite": 3.75,
+    "cacheRead": 0.30
+  },
+  "anthropic/claude-3-5-sonnet": {
+    "input": 3.00,
+    "output": 15.00,
+    "cacheWrite": 3.75,
+    "cacheRead": 0.30
+  },
+  "google/gemini-2.5-flash": {
+    "input": 0.30,
+    "output": 2.50,
+    "cacheWrite": 0,
+    "cacheRead": 0
+  },
+  "google/gemini-3-flash": {
+    "input": 0.50,
+    "output": 3.00,
+    "cacheWrite": 0,
+    "cacheRead": 0
+  },
+  "google/gemini-3-flash-preview": {
+    "input": 0.50,
+    "output": 3.00,
+    "cacheWrite": 0,
+    "cacheRead": 0
+  },
+  "xai/grok-4.1-fast": {
+    "input": 0.20,
+    "output": 0.50,
+    "cacheWrite": 0,
+    "cacheRead": 0
+  }
+};
 
 function getPricing(): Record<string, ModelPricing> {
-  if (PRICING) {
-    return PRICING;
-  }
-
-  try {
-    // Try to read pricing.json
-    let pricingData: string;
-    
-    try {
-      // Method 1: Try using path.resolve (most compatible)
-      pricingData = fs.readFileSync(path.resolve(process.cwd(), 'pricing.json'), 'utf-8');
-    } catch (e) {
-      // Method 2: Try relative path
-      pricingData = fs.readFileSync('./pricing.json', 'utf-8');
-    }
-    
-    PRICING = JSON.parse(pricingData) as Record<string, ModelPricing>;
-    return PRICING;
-  } catch (error) {
-    console.error('[openclaw-face-cost-tracker] Failed to load pricing.json:', error);
-    PRICING = {};
-    return PRICING;
-  }
+  return PRICING;
 }
 
 /**
@@ -297,6 +354,7 @@ async function calculateRecentCosts(sessionKey: string): Promise<CostPayload | n
 
   try {
     const files = fs.readdirSync(sessionDir).filter(f => f.endsWith('.jsonl'));
+    console.log(`[openclaw-face-cost-tracker] Found ${files.length} .jsonl files`);
     
     // Get all session costs from the last hour
     const oneHourAgo = Date.now() - (60 * 60 * 1000);
@@ -353,6 +411,7 @@ async function calculateRecentCosts(sessionKey: string): Promise<CostPayload | n
     }
 
     if (totalMessages === 0) {
+      console.log('[openclaw-face-cost-tracker] No messages found in the last hour');
       return null;
     }
 
