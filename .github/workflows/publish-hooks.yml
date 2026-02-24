@@ -38,9 +38,6 @@ jobs:
       - name: Run tests
         run: pnpm test
 
-      - name: Build package
-        run: pnpm build
-
       - name: Extract version from tag
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
