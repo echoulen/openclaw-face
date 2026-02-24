@@ -1,4 +1,4 @@
-name: Publish openclaw-face-hooks
+name: Publish Hooks
 
 on:
   push:
@@ -8,9 +8,17 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        hook:
+          - name: openclaw-face-hooks
+            directory: hooks/openclaw-face-hooks
+          - name: openclaw-face-cost-tracker
+            directory: hooks/openclaw-face-cost-tracker
+    
     defaults:
       run:
-        working-directory: hooks/openclaw-face-hooks
+        working-directory: ${{ matrix.hook.directory }}
 
     steps:
       - uses: actions/checkout@v4
@@ -28,7 +36,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run tests
-        run: pnpm test:run
+        run: pnpm test
+
+      - name: Build package
+        run: pnpm build
 
       - name: Extract version from tag
         id: get_version
@@ -37,7 +48,7 @@ jobs:
       - name: Set version
         run: npm version ${{ steps.get_version.outputs.VERSION }} --no-git-tag-version
 
-      - name: Publish to npm
+      - name: Publish ${{ matrix.hook.name }} to npm
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
