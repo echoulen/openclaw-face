@@ -12,9 +12,49 @@ import * as path from 'path';
 import * as os from 'os';
 import { createReadStream } from 'fs';
 import { createInterface } from 'readline';
-import { getPricing } from './pricing.js';
 
 config();
+
+/**
+ * Model pricing structure
+ */
+type ModelPricing = {
+  input: number;
+  output: number;
+  cacheWrite: number;
+  cacheRead: number;
+};
+
+/**
+ * Model pricing loaded from JSON file
+ */
+let PRICING: Record<string, ModelPricing> | null = null;
+
+function getPricing(): Record<string, ModelPricing> {
+  if (PRICING) {
+    return PRICING;
+  }
+
+  try {
+    // Try to read pricing.json
+    let pricingData: string;
+    
+    try {
+      // Method 1: Try using path.resolve (most compatible)
+      pricingData = fs.readFileSync(path.resolve(process.cwd(), 'pricing.json'), 'utf-8');
+    } catch (e) {
+      // Method 2: Try relative path
+      pricingData = fs.readFileSync('./pricing.json', 'utf-8');
+    }
+    
+    PRICING = JSON.parse(pricingData) as Record<string, ModelPricing>;
+    return PRICING;
+  } catch (error) {
+    console.error('[openclaw-face-cost-tracker] Failed to load pricing.json:', error);
+    PRICING = {};
+    return PRICING;
+  }
+}
 
 /**
  * Cost payload structure
