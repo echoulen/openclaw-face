@@ -112,12 +112,24 @@ export const CostDisplay: React.FC<CostDisplayProps> = ({ costData }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* First row: Cost amount and Model selector */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+      <Box sx={{ 
+        display: 'flex', 
+        gap: 2,
+        flexDirection: { xs: 'column', sm: 'row' },
+        alignItems: { xs: 'flex-start', sm: 'center' }
+      }}>
+        <Typography variant="h5" sx={{ 
+          fontWeight: 'bold', 
+          color: 'primary.main',
+          fontSize: { xs: '1.25rem', sm: '1.5rem' }
+        }}>
           {displayData ? formatCost(displayData.cost) : '$0.0000'}
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
-        <FormControl size="small" sx={{ minWidth: 200 }}>
+        <FormControl size="small" sx={{ 
+          minWidth: { xs: 150, sm: 200 },
+          width: { xs: '100%', sm: 'auto' }
+        }}>
           <Select
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
@@ -126,6 +138,7 @@ export const CostDisplay: React.FC<CostDisplayProps> = ({ costData }) => {
               '& .MuiOutlinedInput-notchedOutline': {
                 borderColor: 'rgba(255, 255, 255, 0.1)',
               },
+              width: { xs: '100%', sm: 'auto' }
             }}
           >
             <MenuItem value="all">All Models</MenuItem>
@@ -140,9 +153,14 @@ export const CostDisplay: React.FC<CostDisplayProps> = ({ costData }) => {
 
       {/* Token usage and Details side by side */}
       {displayData && (
-        <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+        <Box sx={{ 
+          display: 'flex', 
+          gap: { xs: 2, sm: 3 }, 
+          flexWrap: 'wrap',
+          flexDirection: { xs: 'column', sm: 'row' }
+        }}>
           {/* Token usage */}
-          <Box sx={{ flex: 1, minWidth: 250 }}>
+          <Box sx={{ flex: 1, minWidth: { xs: '100%', sm: 250 } }}>
             <Box 
               sx={{ 
                 display: 'flex', 
@@ -196,7 +214,7 @@ export const CostDisplay: React.FC<CostDisplayProps> = ({ costData }) => {
           </Box>
 
           {/* Message count and other details */}
-          <Box sx={{ flex: 1, minWidth: 250 }}>
+          <Box sx={{ flex: 1, minWidth: { xs: '100%', sm: 250 } }}>
             <Box 
               sx={{ 
                 display: 'flex', 
@@ -216,9 +234,14 @@ export const CostDisplay: React.FC<CostDisplayProps> = ({ costData }) => {
             </Box>
             
             <Collapse in={detailsExpanded}>
-              <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+              <Box sx={{ 
+                display: 'flex', 
+                gap: { xs: 2, sm: 3 }, 
+                flexWrap: 'wrap',
+                flexDirection: { xs: 'column', sm: 'row' }
+              }}>
                 {/* Message count */}
-                <Box sx={{ minWidth: 120 }}>
+                <Box sx={{ minWidth: { xs: '100%', sm: 120 } }}>
                   <Typography variant="caption" color="text.secondary">
                     Messages
                   </Typography>
@@ -228,7 +251,7 @@ export const CostDisplay: React.FC<CostDisplayProps> = ({ costData }) => {
                 </Box>
 
                 {/* Last update time */}
-                <Box sx={{ minWidth: 180 }}>
+                <Box sx={{ minWidth: { xs: '100%', sm: 180 } }}>
                   <Typography variant="caption" color="text.secondary">
                     Last Updated
                   </Typography>
@@ -239,7 +262,7 @@ export const CostDisplay: React.FC<CostDisplayProps> = ({ costData }) => {
 
                 {/* Session key */}
                 {costData.sessionKey && (
-                  <Box sx={{ flex: 1, minWidth: 200 }}>
+                  <Box sx={{ flex: 1, minWidth: { xs: '100%', sm: 200 } }}>
                     <Typography variant="caption" color="text.secondary">
                       Session
                     </Typography>
