@@ -1,127 +1,69 @@
 # OpenClaw Face
 
-A zero-port-exposure agent status visualization system using p5.js heartbeat animation. OpenClaw pushes status to Cloudflare R2, and GitHub Pages polls R2 to display the real-time status.
+![Idle State](docs/idle.png) ![Busy State](docs/busy.png)
+
+A zero-port-exposure agent status and cost visualization system using p5.js heartbeat animation. OpenClaw pushes status and cost data to Cloudflare R2, and the Face web app polls R2 to display real-time information.
 
 ## Architecture
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   OpenClaw      │────▶│  Cloudflare R2  │────▶│  GitHub Pages   │
-│   (localhost)   │ PUT │  (status.json)  │ GET │  Face           │
+│   OpenClaw      │────▶│  Cloudflare R2  │────▶│  Face Web App   │
+│   (localhost)   │ PUT │  status.json    │ GET │                 │
+│                 │     │  cost.json      │     │                 │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 20+
 - pnpm
-- Cloudflare R2 account
-- GitHub repository with GitHub Pages enabled
+- Cloudflare R2 account (with public bucket configured)
 
 ## Installation
 
-### 1. Clone and Install Dependencies
+### 1. Install OpenClaw Hooks
+
+Install both hooks using OpenClaw CLI:
 
 ```bash
-# Install hook dependencies
-cd hooks/openclaw-face-hooks
-pnpm install
-
-# Install face dependencies
-cd ../../face
-pnpm install
+openclaw hooks install openclaw-face-hooks
+openclaw hooks install openclaw-face-cost-tracker
 ```
 
 ### 2. Configure R2 Bucket
 
-Create a bucket in Cloudflare R2 with the following settings:
-
-- **Bucket Name**: `openclaw-status-[your-username]`
-- **Public Access**: Enable (read-only)
-- **CORS Policy**: Allow GET from all origins
-
-#### CORS Configuration
-
-```json
-[
-  {
-    "AllowedOrigins": ["*"],
-    "AllowedMethods": ["GET"],
-    "AllowedHeaders": ["*"],
-    "MaxAgeSeconds": 3600
-  }
-]
-```
-
-Apply CORS via Cloudflare Dashboard or R2 API.
+Create a Cloudflare R2 bucket with public read access and CORS enabled for GET requests. Configure the bucket according to your requirements.
 
 ### 3. Set Environment Variables
 
-Copy the example environment file and fill in your values:
+Configure environment variables for the hooks:
 
 ```bash
+# In hooks/openclaw-face-hooks/
+cp .env.example .env
+
+# In hooks/openclaw-face-cost-tracker/
 cp .env.example .env
 ```
 
-Edit `.env` with your R2 credentials:
+Edit each `.env` with your R2 credentials:
 
 ```env
 R2_ACCESS_KEY_ID=your_access_key
 R2_SECRET_ACCESS_KEY=your_secret_key
 R2_ENDPOINT=https://your-account-id.r2.cloudflarestorage.com
-R2_BUCKET=openclaw-status-your-username
+R2_BUCKET=your-bucket-name
 ```
-
-### 4. Enable the Hook
-
-```bash
-openclaw hooks enable openclaw-face-hooks
-```
-
-### 5. Deploy the Face Dashboard
-
-```bash
-cd face
-./deploy.sh
-```
-
-This will:
-1. Build the React application
-2. Deploy to `gh-pages` branch
-3. GitHub Pages will automatically publish
 
 ## Configuration
 
 ### R2 Bucket Setup
 
-1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/?to=/:account/r2/overview)
-2. Create a new R2 bucket named `openclaw-status-[username]`
-3. Create an R2 API token with these permissions:
-   - Object Read & Write
-   - Apply to specific bucket only
-4. Note your endpoint URL: `https://[account-id].r2.cloudflarestorage.com`
-
-### CORS Configuration
-
-The R2 bucket must allow GET requests from any origin for the dashboard to work:
-
-```json
-[
-  {
-    "AllowedOrigins": ["*"],
-    "AllowedMethods": ["GET"],
-    "AllowedHeaders": ["*"],
-    "MaxAgeSeconds": 3600
-  }
-]
-```
-
-### GitHub Pages Setup
-
-1. Go to your repository Settings > Pages
-2. Source: "Deploy from a branch"
-3. Branch: `gh-pages` / (root)
-4. Click Save
+Configure your Cloudflare R2 bucket with:
+- Public read access
+- CORS enabled for GET requests from your web app origin
+- API token with Object Read & Write permissions
 
 ## Testing
 
@@ -137,7 +79,7 @@ pnpm test:run
 Check if the status.json is accessible:
 
 ```bash
-curl https://[account-id].r2.cloudflarestorage.com/openclaw-status-[user]/status.json
+curl https://[account-id].r2.cloudflarestorage.com/[BucketName]/status.json
 ```
 
 Expected response:
@@ -151,6 +93,49 @@ Expected response:
 }
 ```
 
+
+```bash
+curl https://[account-id].r2.cloudflarestorage.com/[BucketName]/cost.json
+```
+
+Expected response:
+
+```json
+{
+  "timestamp": "2026-02-25T05:32:17.984Z",
+  "sessionKey": "agent:main:telegram:group:-1003865396205",
+  "totalCost": 45.66687710000001,
+  "models": {
+    "gemini-2.5-flash": {
+      "cost": 7.382915699999999,
+      "inputTokens": 21043668,
+      "outputTokens": 101379,
+      "cacheReadTokens": 10884904,
+      "cacheWriteTokens": 0,
+      "messageCount": 272
+    },
+    "gemini-3-flash-preview": {
+      "cost": 8.546862399999998,
+      "inputTokens": 15814715,
+      "outputTokens": 42375,
+      "cacheReadTokens": 10247598,
+      "cacheWriteTokens": 0,
+      "messageCount": 432
+    },
+    "gemini-3-pro-preview": {
+      "cost": 29.737099,
+      "inputTokens": 13516391,
+      "outputTokens": 47698,
+      "cacheReadTokens": 10659705,
+      "cacheWriteTokens": 0,
+      "messageCount": 172
+    }
+  },
+  "messageCount": 902,
+  "lastMessageTime": "2026-02-25T05:31:21.179Z"
+}
+```
+
 ## Usage
 
 ### Start OpenClaw
@@ -159,21 +144,41 @@ Expected response:
 openclaw start
 ```
 
-The hook will automatically:
-1. Push `busy: true` on `/new` command
-2. Push `busy: false` on `/stop` or `/reset` command
+The hooks will automatically:
+- **openclaw-face-hooks**: Push `busy: true/false` on agent state changes
+- **openclaw-face-cost-tracker**: Push cost data updates
 
 ### View Dashboard
 
-Open your GitHub Pages URL:
+Access the Face web app at: **https://echoulen.github.io/openclaw-face/**
+
+#### Using Custom R2 Bucket URLs
+
+You can customize the dashboard to use your own R2 bucket by adding URL parameters:
+
 ```
-https://[owner].github.io/[repo]/
+https://echoulen.github.io/openclaw-face/?status=YOUR_STATUS_URL&cost=YOUR_COST_URL
 ```
+
+**Example:**
+```
+https://echoulen.github.io/openclaw-face/?status=https://pub-dcbb32a3717b46e4b741f6a1ff236e83.r2.dev/status.json&cost=https://pub-dcbb32a3717b46e4b741f6a1ff236e83.r2.dev/cost.json
+```
+
+**Parameters:**
+- `status`: URL to your `status.json` file
+- `cost`: URL to your `cost.json` file
+
+**Notes:**
+- If no parameters are provided, the dashboard uses default configuration
+- Both parameters are optional - you can specify just one if needed
+- URLs must be publicly accessible (no authentication required)
 
 You should see:
 - **Green sine wave**: Agent is idle
 - **Red pulsing animation**: Agent is busy
 - **Gray wave**: Connection lost
+- **Cost display**: Real-time cost tracking with model breakdown
 
 ## Troubleshooting
 
@@ -195,48 +200,43 @@ You should see:
 
 1. Verify R2 bucket is publicly readable
 2. Check browser console for CORS errors
-3. Verify the status.json URL is correct in `face/src/config.ts`
-
-### CORS Errors
-
-Ensure your R2 bucket has the correct CORS policy applied. You can verify with:
-
-```bash
-curl -I https://[bucket].r2.cloudflarestorage.com/status.json
-```
-
-Should return `Access-Control-Allow-Origin: *` header.
+3. Verify the URLs in `face/.env` are correct
+4. **For custom URLs**: Test your URLs directly:
+   ```bash
+   curl "YOUR_STATUS_URL"
+   curl "YOUR_COST_URL"
+   ```
+5. **For custom URLs**: Ensure URLs are properly URL-encoded if they contain special characters
 
 ## File Structure
 
 ```
 openclaw-face/
-├── README.md                 # This file
-├── .env.example              # Environment variables template
-├── face/                     # React + p5.js dashboard
+├── README.md
+├── face/                              # React + p5.js web app
+│   ├── .env.example                   # Web app environment variables
 │   ├── src/
-│   │   ├── App.tsx          # Main application
-│   │   ├── config.ts        # Configuration
-│   │   ├── types.ts         # TypeScript types
-│   │   ├── components/      # React components
-│   │   ├── hooks/           # Custom hooks
-│   │   └── sketches/        # p5.js sketches
-│   ├── deploy.sh            # Deployment script
+│   │   ├── components/                # React components
+│   │   ├── hooks/                     # Custom React hooks
+│   │   └── sketches/                  # p5.js animation sketches
 │   └── package.json
-├── hooks/
-│   └── openclaw-face-hooks/  # OpenClaw hook
-│       ├── HOOK.md          # Hook metadata (YAML frontmatter)
-│       ├── handler.ts       # HookHandler implementation
-│       ├── test-push.ts     # Integration test script
-│       └── __tests__/       # Unit & property tests
+└── hooks/
+    ├── openclaw-face-hooks/           # Status tracking hook
+    │   ├── .env.example
+    │   ├── HOOK.md
+    │   └── handler.ts
+    └── openclaw-face-cost-tracker/    # Cost tracking hook
+        ├── .env.example
+        ├── HOOK.md
+        └── handler.ts
 ```
 
 ## Security
 
 - **Zero Port Exposure**: OpenClaw only runs on localhost
-- **Read-Only Dashboard**: GitHub Pages cannot write to R2
-- **No Credentials in Frontend**: Dashboard uses public R2 URL only
-- **Minimal Permissions**: Hook only needs PutObject on status.json
+- **Read-Only Dashboard**: Face web app only reads from R2
+- **No Credentials in Frontend**: Dashboard uses public R2 URLs only
+- **Minimal Permissions**: Hooks only need PutObject permissions
 
 ## License
 

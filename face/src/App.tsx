@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Typography, Box, Container, Paper, Divider } from '@mui/material';
@@ -26,12 +26,44 @@ const theme = createTheme({
   },
 });
 
+// Function to parse URL parameters
+const getUrlParams = () => {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    status: params.get('status'),
+    cost: params.get('cost'),
+  };
+};
+
 function App() {
-  // Use status polling hook (Requirement 3.1)
-  const { status, connectionState } = useStatusPolling(R2_PUBLIC_URL);
+  // Parse URL parameters and use them to override default URLs
+  const [customUrls, setCustomUrls] = useState(() => {
+    const params = getUrlParams();
+    return {
+      statusUrl: params.status || R2_PUBLIC_URL,
+      costUrl: params.cost || R2_COST_URL,
+    };
+  });
+
+  // Update URLs when URL parameters change
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = getUrlParams();
+      setCustomUrls({
+        statusUrl: params.status || R2_PUBLIC_URL,
+        costUrl: params.cost || R2_COST_URL,
+      });
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Use status polling hook with custom URL
+  const { status, connectionState } = useStatusPolling(customUrls.statusUrl);
   
-  // Use cost polling hook
-  const { costData } = useCostPolling(R2_COST_URL);
+  // Use cost polling hook with custom URL
+  const { costData } = useCostPolling(customUrls.costUrl);
 
   // Development mode for showing extra debug info
   const [devMode] = useState(() => import.meta.env?.dev === true || import.meta.env?.MODE === 'development');
