@@ -1,23 +1,22 @@
 /**
- * OpenClaw Face - Status Polling Hook
+ * OpenClaw Face - Cost Polling Hook
  * 
- * Implements polling logic for fetching agent status from R2.
- * Requirements: 3.1, 3.2, 3.3, 3.4, 3.5
+ * Implements polling logic for fetching cost data from R2.
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { AgentStatus, ConnectionState, defaultConnectionState } from '../types';
-import { R2_PUBLIC_URL } from '../config';
+import { CostData, ConnectionState, defaultConnectionState } from '../types';
+import { R2_COST_URL } from '../config';
 
 /**
- * Status polling hook result
+ * Cost polling hook result
  */
-export interface UseStatusPollingResult {
-  /** Current agent status (null if no successful fetch yet) */
-  status: AgentStatus | null;
+export interface UseCostPollingResult {
+  /** Current cost data (null if no successful fetch yet) */
+  costData: CostData | null;
   /** Connection state with failure tracking */
   connectionState: ConnectionState;
-  /** Manually trigger a status fetch */
+  /** Manually trigger a cost fetch */
   refresh: () => Promise<void>;
   /** Start polling */
   startPolling: () => void;
@@ -26,27 +25,27 @@ export interface UseStatusPollingResult {
 }
 
 /**
- * Custom hook for polling agent status from R2
+ * Custom hook for polling cost data from R2
  * 
  * Features:
- * - Polls every 5 seconds (configurable)
+ * - Polls every 10 minutes (configurable)
  * - Fetches and parses JSON from R2 public URL
  * - Handles errors with retry logic
  * - Manages connection state (failure count, connected status)
  * - Continues polling after failures
  * 
- * @param r2Url - URL to fetch status from (defaults to R2_PUBLIC_URL)
- * @param interval - Polling interval in milliseconds (default: 5000)
+ * @param r2Url - URL to fetch cost data from (defaults to R2_COST_URL)
+ * @param interval - Polling interval in milliseconds (default: 600000 = 10 minutes)
  * @param maxFailures - Maximum consecutive failures before showing error (default: 3)
- * @returns Status polling result with status, connection state, and control functions
+ * @returns Cost polling result with cost data, connection state, and control functions
  */
-export function useStatusPolling(
-  r2Url: string = R2_PUBLIC_URL,
-  interval: number = 5000,
+export function useCostPolling(
+  r2Url: string = R2_COST_URL,
+  interval: number = 600000, // 10 minutes in milliseconds
   maxFailures: number = 3
-): UseStatusPollingResult {
-  // Current agent status (null if no successful fetch yet)
-  const [status, setStatus] = useState<AgentStatus | null>(null);
+): UseCostPollingResult {
+  // Current cost data (null if no successful fetch yet)
+  const [costData, setCostData] = useState<CostData | null>(null);
   
   // Connection state with failure tracking
   const [connectionState, setConnectionState] = useState<ConnectionState>(defaultConnectionState);
@@ -56,9 +55,9 @@ export function useStatusPolling(
   const isPollingRef = useRef<boolean>(false);
   
   /**
-   * Fetch status from R2 and update state
+   * Fetch cost data from R2 and update state
    */
-  const fetchStatus = useCallback(async () => {
+  const fetchCostData = useCallback(async () => {
     try {
       const response = await fetch(r2Url, {
         method: 'GET',
@@ -71,35 +70,28 @@ export function useStatusPolling(
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
-      // Parse JSON response (Requirement 3.2)
+      // Parse JSON response
       const data = await response.json();
       
       // Validate required fields
-      if (typeof data.busy !== 'boolean' || typeof data.ts !== 'number') {
-        throw new Error('Invalid status format: missing required fields');
+      if (typeof data.totalCost !== 'number' || typeof data.models !== 'object') {
+        throw new Error('Invalid cost data format: missing required fields');
       }
       
-      // Update status with parsed data
-      const newStatus: AgentStatus = {
-        busy: data.busy,
-        ts: data.ts,
-        sessionKey: data.sessionKey,
-        source: data.source,
-      };
+      // Update cost data with parsed data
+      setCostData(data);
       
-      setStatus(newStatus);
-      
-      // Update connection state on success (Requirement 3.5)
+      // Update connection state on success
       setConnectionState(_prev => ({
         connected: true,
         lastSuccessTime: Date.now(),
         failureCount: 0,
       }));
       
-      console.log('[useStatusPolling] Status updated:', newStatus);
+      console.log('[useCostPolling] Cost data updated:', data);
     } catch (error) {
-      // Handle errors (Requirement 3.3)
-      console.error('[useStatusPolling] Fetch failed:', error);
+      // Handle errors
+      console.error('[useCostPolling] Fetch failed:', error);
       
       setConnectionState(prev => {
         const newFailureCount = prev.failureCount + 1;
@@ -115,7 +107,7 @@ export function useStatusPolling(
   }, [r2Url, maxFailures]);
   
   /**
-   * Start polling (Requirement 3.1)
+   * Start polling
    */
   const startPolling = useCallback(() => {
     if (isPollingRef.current) {
@@ -125,13 +117,13 @@ export function useStatusPolling(
     isPollingRef.current = true;
     
     // Initial fetch
-    fetchStatus();
+    fetchCostData();
     
     // Set up interval for polling
-    intervalIdRef.current = setInterval(fetchStatus, interval);
+    intervalIdRef.current = setInterval(fetchCostData, interval);
     
-    console.log('[useStatusPolling] Polling started');
-  }, [fetchStatus, interval]);
+    console.log('[useCostPolling] Polling started');
+  }, [fetchCostData, interval]);
   
   /**
    * Stop polling
@@ -143,15 +135,15 @@ export function useStatusPolling(
     }
     
     isPollingRef.current = false;
-    console.log('[useStatusPolling] Polling stopped');
+    console.log('[useCostPolling] Polling stopped');
   }, []);
   
   /**
    * Manual refresh
    */
   const refresh = useCallback(async () => {
-    await fetchStatus();
-  }, [fetchStatus]);
+    await fetchCostData();
+  }, [fetchCostData]);
   
   // Set up polling on mount
   useEffect(() => {
@@ -164,7 +156,7 @@ export function useStatusPolling(
   }, [startPolling, stopPolling]);
   
   return {
-    status,
+    costData,
     connectionState,
     refresh,
     startPolling,

@@ -3,10 +3,11 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Typography, Box, Container, Paper, Divider } from '@mui/material';
 import { useStatusPolling } from './hooks/useStatusPolling';
+import { useCostPolling } from './hooks/useCostPolling';
 import { HeartbeatCanvas } from './components/HeartbeatCanvas';
 import { StatusDisplay } from './components/StatusDisplay';
 import { ConnectionIndicator } from './components/ConnectionIndicator';
-import { R2_PUBLIC_URL } from './config';
+import { R2_PUBLIC_URL, R2_COST_URL } from './config';
 
 // Material-UI theme
 const theme = createTheme({
@@ -28,6 +29,9 @@ const theme = createTheme({
 function App() {
   // Use status polling hook (Requirement 3.1)
   const { status, connectionState } = useStatusPolling(R2_PUBLIC_URL);
+  
+  // Use cost polling hook
+  const { costData } = useCostPolling(R2_COST_URL);
 
   // Development mode for showing extra debug info
   const [devMode] = useState(() => import.meta.env?.dev === true || import.meta.env?.MODE === 'development');
@@ -72,7 +76,7 @@ function App() {
           <Divider sx={{ my: 2 }} />
 
           {/* Status display (Requirements 4.5, 4.6) */}
-          <StatusDisplay status={status} />
+          <StatusDisplay status={status} costData={costData} />
         </Paper>
 
         {/* Footer */}

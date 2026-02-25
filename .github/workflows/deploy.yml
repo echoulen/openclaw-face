@@ -53,6 +53,7 @@ jobs:
         run: pnpm run build
         env:
           VITE_R2_PUBLIC_URL: ${{ secrets.VITE_R2_PUBLIC_URL }}
+          VITE_R2_COST_URL: ${{ secrets.VITE_R2_COST_URL }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

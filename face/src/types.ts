@@ -13,6 +13,25 @@ export interface AgentStatus {
 }
 
 /**
+ * Cost data from R2 cost.json
+ */
+export interface CostData {
+  timestamp: string;
+  sessionKey: string;
+  totalCost: number;
+  models: Record<string, {
+    cost: number;
+    inputTokens: number;
+    outputTokens: number;
+    cacheReadTokens: number;
+    cacheWriteTokens: number;
+    messageCount: number;
+  }>;
+  messageCount: number;
+  lastMessageTime: string;
+}
+
+/**
  * Connection state for polling
  */
 export interface ConnectionState {

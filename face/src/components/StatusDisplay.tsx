@@ -1,9 +1,19 @@
 import React from 'react';
-import { Typography, Box, Paper } from '@mui/material';
-import { AgentStatus } from '../types';
+import {
+  Typography,
+  Box,
+  Paper,
+  Alert,
+  Divider,
+  useTheme,
+  useMediaQuery,
+} from '@mui/material';
+import { AgentStatus, CostData } from '../types';
+import { CostDisplay } from './CostDisplay';
 
 export interface StatusDisplayProps {
   status: AgentStatus | null;
+  costData?: CostData | null;
 }
 
 /**
@@ -24,18 +34,20 @@ const formatTimestamp = (ts: number): string => {
 };
 
 /**
- * StatusDisplay - React component that displays agent status information
+ * StatusDisplay - React component that displays agent status and cost information
  * 
  * Features:
  * - Shows latest update time (formatted)
  * - Shows source channel (if exists)
  * - Shows session key (if exists)
- * - Uses MUI Typography components
- * 
- * Requirements: 4.5, 4.6
+ * - Cost tracking with model selection
+ * - Uses MUI components
  */
-export const StatusDisplay: React.FC<StatusDisplayProps> = ({ status }) => {
-  if (!status) {
+export const StatusDisplay: React.FC<StatusDisplayProps> = ({ status, costData }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  if (!status && !costData) {
     return (
       <Paper
         elevation={0}
@@ -46,7 +58,7 @@ export const StatusDisplay: React.FC<StatusDisplayProps> = ({ status }) => {
         }}
       >
         <Typography variant="body2" color="text.secondary">
-          Waiting for status data...
+          Waiting for data...
         </Typography>
       </Paper>
     );
@@ -61,45 +73,80 @@ export const StatusDisplay: React.FC<StatusDisplayProps> = ({ status }) => {
         borderRadius: 1,
       }}
     >
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-        {/* Last update time */}
-        <Box>
-          <Typography variant="caption" color="text.secondary">
-            Last Updated
-          </Typography>
-          <Typography variant="body2">
-            {formatTimestamp(status.ts)}
-          </Typography>
-        </Box>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
+        {/* Status Section - Left */}
+        {status ? (
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography variant="h6" sx={{ mb: 2, color: 'primary.main' }}>
+              Status
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              {/* Last update time */}
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Last Updated
+                </Typography>
+                <Typography variant="body2">
+                  {formatTimestamp(status.ts)}
+                </Typography>
+              </Box>
 
-        {/* Source channel (if exists) */}
-        {status.source && (
-          <Box>
-            <Typography variant="caption" color="text.secondary">
-              Source
-            </Typography>
-            <Typography variant="body1" sx={{ fontWeight: 500 }}>
-              {status.source}
-            </Typography>
+              {/* Source channel (if exists) */}
+              {status.source && (
+                <Box>
+                  <Typography variant="caption" color="text.secondary">
+                    Source
+                  </Typography>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                    {status.source}
+                  </Typography>
+                </Box>
+              )}
+
+              {/* Session key (if exists) */}
+              {status.sessionKey && (
+                <Box>
+                  <Typography variant="caption" color="text.secondary">
+                    Session
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontFamily: 'monospace',
+                      fontSize: '0.75rem',
+                      wordBreak: 'break-all',
+                    }}
+                  >
+                    {status.sessionKey}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          </Box>
+        ) : (
+          <Box sx={{ flex: 1 }}>
+            <Alert severity="info">No status data available</Alert>
           </Box>
         )}
 
-        {/* Session key (if exists) */}
-        {status.sessionKey && (
-          <Box>
-            <Typography variant="caption" color="text.secondary">
-              Session
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                fontFamily: 'monospace',
-                fontSize: '0.75rem',
-                wordBreak: 'break-all',
-              }}
-            >
-              {status.sessionKey}
-            </Typography>
+        {/* Divider - Vertical on desktop, horizontal on mobile */}
+        {status && costData && (
+          <Divider 
+            orientation={isMobile ? 'horizontal' : 'vertical'} 
+            flexItem 
+            sx={{ mx: isMobile ? 0 : 1 }}
+          />
+        )}
+
+        {/* Cost Section - Right */}
+        {costData && (
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+              <Typography variant="h6" sx={{ color: 'primary.main' }}>
+                Cost
+              </Typography>
+            </Box>
+            <CostDisplay costData={costData} />
           </Box>
         )}
       </Box>
